@@ -1,48 +1,74 @@
 import ExpoModulesCore
 
-public class DownloadsModule: Module {
-  // Each module class must implement the definition function. The definition consists of components
-  // that describes the module's functionality and behavior.
-  // See https://docs.expo.dev/modules/module-api for more details about available components.
+public class DownloadsModule: Module, UIDocumentPickerDelegate {
   public func definition() -> ModuleDefinition {
-    // Sets the name of the module that JavaScript code will use to refer to the module. Takes a string as an argument.
-    // Can be inferred from module's class name, but it's recommended to set it explicitly for clarity.
-    // The module will be accessible from `requireNativeModule('Downloads')` in JavaScript.
     Name("Downloads")
 
-    // Sets constant properties on the module. Can take a dictionary or a closure that returns a dictionary.
-    Constants([
-      "PI": Double.pi
-    ])
-
-    // Defines event names that the module can send to JavaScript.
-    Events("onChange")
-
-    // Defines a JavaScript synchronous function that runs the native code on the JavaScript thread.
-    Function("hello") {
-      return "Hello world! 👋"
-    }
-
-    // Defines a JavaScript function that always returns a Promise and whose native code
-    // is by default dispatched on the different thread than the JavaScript runtime runs on.
-    AsyncFunction("setValueAsync") { (value: String) in
-      // Send an event to JavaScript.
-      self.sendEvent("onChange", [
-        "value": value
-      ])
-    }
-
-    // Enables the module to be used as a native view. Definition components that are accepted as part of the
-    // view definition: Prop, Events.
-    View(DownloadsView.self) {
-      // Defines a setter for the `url` prop.
-      Prop("url") { (view: DownloadsView, url: URL) in
-        if view.webView.url != url {
-          view.webView.load(URLRequest(url: url))
+    AsyncFunction("saveToDownloads") { (fileName: String, mimeType: String, base64Data: String) async throws -> String in
+      // 引数の検証（Android実装と同様のチェック）
+      if fileName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        throw InvalidArgumentsException("fileName cannot be blank")
+      }
+      if mimeType.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !mimeType.contains("/") {
+        throw InvalidArgumentsException("mimeType format is invalid")
+      }
+      if base64Data.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+        throw InvalidArgumentsException("base64Data cannot be blank")
+      }
+      let nonWhitespace = base64Data.filter { !$0.isWhitespace }
+      if nonWhitespace.count % 4 != 0 {
+        throw InvalidArgumentsException("base64Data length (ignoring whitespace) must be a multiple of 4")
+      }
+      
+      // Base64 デコードしてデータ取得
+      guard let data = Data(base64Encoded: base64Data) else {
+        throw InvalidArgumentsException("base64Data is invalid")
+      }
+      
+      // 一時ファイルのパス作成
+      let tempDir = FileManager.default.temporaryDirectory
+      let tempFileURL = tempDir.appendingPathComponent(fileName)
+      try data.write(to: tempFileURL)
+      
+      // UIDocumentPicker を用いてエクスポート（ファイル保存）させる
+      return try await withCheckedThrowingContinuation { continuation in
+        DispatchQueue.main.async {
+          guard let viewController = self.appContext.reactViewController else {
+            continuation.resume(throwing: MissingCurrentViewControllerException())
+            return
+          }
+          let picker: UIDocumentPickerViewController
+          if #available(iOS 15.0, *) {
+            picker = UIDocumentPickerViewController(forExporting: [tempFileURL], asCopy: true)
+          } else {
+            picker = UIDocumentPickerViewController(url: tempFileURL, in: .exportToService)
+          }
+          picker.delegate = self
+          self.saveToDownloadsContinuation = continuation
+          viewController.present(picker, animated: true, completion: nil)
         }
       }
+    }
+  }
 
-      Events("onLoad")
+  // saveToDownloads の Promise 解決用 continuation を保持します（シンプルな実装のため、並列呼び出しへの対応は省略）
+  private var saveToDownloadsContinuation: CheckedContinuation<String, Error>?
+}
+
+// MARK: - UIDocumentPickerDelegate 実装
+extension DownloadsModule: UIDocumentPickerDelegate {
+  public func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
+    if let continuation = self.saveToDownloadsContinuation {
+      continuation.resume(throwing: UserCancelledException())
+      self.saveToDownloadsContinuation = nil
+    }
+  }
+  
+  public func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+    if let continuation = self.saveToDownloadsContinuation {
+      // 解決時は選択された最初の URL の文字列を返します
+      continuation.resume(returning: urls.first?.absoluteString ?? "")
+      self.saveToDownloadsContinuation = nil
     }
   }
 }
