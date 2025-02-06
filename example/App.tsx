@@ -1,9 +1,10 @@
-import { useEvent } from 'expo';
-import Downloads, { DownloadsView } from '@pocketsign/expo-downloads';
-import { Button, SafeAreaView, ScrollView, Text, View } from 'react-native';
+import React from "react";
+import { useEvent } from "expo";
+import Downloads, { DownloadsView } from "@pocketsign/expo-downloads";
+import { Button, SafeAreaView, ScrollView, Text, View } from "react-native";
 
 export default function App() {
-  const onChangePayload = useEvent(Downloads, 'onChange');
+  const onChangePayload = useEvent(Downloads, "onChange");
 
   return (
     <SafeAreaView style={styles.container}>
@@ -19,7 +20,7 @@ export default function App() {
           <Button
             title="Set value"
             onPress={async () => {
-              await Downloads.setValueAsync('Hello from JS!');
+              await Downloads.setValueAsync("Hello from JS!");
             }}
           />
         </Group>
@@ -58,13 +59,13 @@ const styles = {
   },
   group: {
     margin: 20,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
     padding: 20,
   },
   container: {
     flex: 1,
-    backgroundColor: '#eee',
+    backgroundColor: "#eee",
   },
   view: {
     flex: 1,

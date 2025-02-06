@@ -31,8 +31,10 @@
   "dependencies": {},
   "devDependencies": {
     "@types/react": "~18.3.12",
+    "eslint": "^8.57.1",
     "expo": "~52.0.0",
     "expo-module-scripts": "^4.0.3",
+    "prettier": "^3.4.2",
     "react-native": "0.76.0"
   },
   "peerDependencies": {

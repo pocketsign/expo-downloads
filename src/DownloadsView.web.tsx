@@ -1,6 +1,6 @@
-import * as React from 'react';
+import * as React from "react";
 
-import { DownloadsViewProps } from './Downloads.types';
+import { DownloadsViewProps } from "./Downloads.types";
 
 export default function DownloadsView(props: DownloadsViewProps) {
   return (
