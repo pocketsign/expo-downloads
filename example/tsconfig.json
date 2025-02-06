@@ -1,0 +1,10 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": true,
+    "paths": {
+      "@pocketsign/expo-downloads": ["../src/index"],
+      "@pocketsign/expo-downloads/*": ["../src/*"]
+    }
+  }
+}
