@@ -38,7 +38,7 @@ class DownloadsModule : Module() {
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    private fun saveWithMediaStore(fileName: String, mimeType: String, base64Data: String): String {
+    private fun saveWithMediaStore(fileName: String, mimeType: String, base64Data: String): DownloadResponse {
         val contentValues = ContentValues().apply {
             put(MediaStore.Downloads.DISPLAY_NAME, fileName)
             put(MediaStore.Downloads.MIME_TYPE, mimeType)
@@ -58,25 +58,24 @@ class DownloadsModule : Module() {
             contentValues.clear()
             contentValues.put(MediaStore.Downloads.IS_PENDING, 0)
             resolver.update(uri, contentValues, null, null)
-            return uri.toString()
+            return DownloadResponse(uri = uri.toString())
         } catch (e: Exception) {
             resolver.delete(uri, null, null)
             throw e
         }
     }
 
-    private fun saveLegacy(fileName: String, mimeType: String, base64Data: String): String {
+    private fun saveLegacy(fileName: String, mimeType: String, base64Data: String): DownloadResponse {
         // Storage Access Frameworkを使用してDownloadsフォルダにファイルを作成
         val downloadsTreeUri = Uri.parse("content://com.android.externalstorage.documents/tree/primary%3ADownload")
-        val fileUri =
-            DocumentsContract.createDocument(mContext.contentResolver, downloadsTreeUri, mimeType, fileName)
-                ?: throw DirectoryCreationException()
+        val fileUri = DocumentsContract.createDocument(mContext.contentResolver, downloadsTreeUri, mimeType, fileName)
+            ?: throw DirectoryCreationException()
 
         try {
             mContext.contentResolver.openOutputStream(fileUri)?.use { outputStream ->
                 decodeBase64UsingStream(base64Data, outputStream)
             } ?: throw OutputStreamCreationException()
-            return fileUri.toString()
+            return DownloadResponse(uri = fileUri.toString())
         } catch (e: Exception) {
             mContext.contentResolver.delete(fileUri, null, null)
             throw e
@@ -100,16 +99,16 @@ class DownloadsModule : Module() {
         if (fileName.trim().isEmpty()) {
             throw InvalidArgumentException("fileName cannot be blank")
         }
-        
+
         val mimePattern = Regex("^[\\w.+-]+/[\\w.+-]+$")
         if (!mimePattern.matches(mimeType.trim())) {
             throw InvalidArgumentException("mimeType format is invalid")
         }
-        
+
         if (base64Data.isBlank()) {
             throw InvalidArgumentException("base64Data cannot be blank")
         }
-        
+
         var nonWhitespaceCharCount = 0
         for (ch in base64Data) {
             if (!ch.isWhitespace()) {

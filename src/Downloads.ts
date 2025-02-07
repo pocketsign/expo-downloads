@@ -1,16 +1,13 @@
 import { NativeModule, requireNativeModule } from "expo";
 
-import { DownloadsModuleInterface } from "./Downloads.types";
+import { DownloadResponse, IDownloadsModule } from "./Downloads.types";
 
-declare class DownloadsModule
-  extends NativeModule
-  implements DownloadsModuleInterface
-{
+declare class DownloadsModule extends NativeModule implements IDownloadsModule {
   saveToDownloads(
     fileName: string,
     mimeType: string,
     base64Data: string
-  ): Promise<string>;
+  ): Promise<DownloadResponse>;
 }
 
 export default requireNativeModule<DownloadsModule>("Downloads");

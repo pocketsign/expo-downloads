@@ -1,74 +1,99 @@
-import React from "react";
-import { useEvent } from "expo";
-import Downloads, { DownloadsView } from "@pocketsign/expo-downloads";
-import { Button, SafeAreaView, ScrollView, Text, View } from "react-native";
+import React, { useState } from "react";
+import Downloads from "@pocketsign/expo-downloads";
+import {
+  Button,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  View,
+  StyleSheet,
+} from "react-native";
 
 export default function App() {
-  const onChangePayload = useEvent(Downloads, "onChange");
+  const [result, setResult] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const saveFile = async () => {
+    setError(null);
+    setResult(null);
+    // 静的なパラメーターでファイル保存
+    const fileName = "hello.txt";
+    const mimeType = "text/plain";
+    const base64Data = "SGVsbG8sIHdvcmxkIQ=="; // "Hello, world!" の Base64
+
+    try {
+      const result = await Downloads.saveToDownloads(
+        fileName,
+        mimeType,
+        base64Data
+      );
+      if (result.cancelled) {
+        setError("Download cancelled");
+      } else {
+        setResult(result.uri);
+      }
+    } catch (err: any) {
+      setError(err.message || "An error occurred");
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.container}>
-        <Text style={styles.header}>Module API Example</Text>
-        <Group name="Constants">
-          <Text>{Downloads.PI}</Text>
-        </Group>
-        <Group name="Functions">
-          <Text>{Downloads.hello()}</Text>
-        </Group>
-        <Group name="Async functions">
-          <Button
-            title="Set value"
-            onPress={async () => {
-              await Downloads.setValueAsync("Hello from JS!");
-            }}
-          />
-        </Group>
-        <Group name="Events">
-          <Text>{onChangePayload?.value}</Text>
-        </Group>
-        <Group name="Views">
-          <DownloadsView
-            url="https://www.example.com"
-            onLoad={({ nativeEvent: { url } }) => console.log(`Loaded: ${url}`)}
-            style={styles.view}
-          />
-        </Group>
+      <ScrollView contentContainerStyle={styles.content}>
+        <Text style={styles.header}>Downloads Module Sample</Text>
+        <Button title="Save File" onPress={saveFile} />
+        {result && (
+          <View style={styles.resultContainer}>
+            <Text style={styles.resultTitle}>Saved File URL:</Text>
+            <Text style={styles.resultText}>{result}</Text>
+          </View>
+        )}
+        {error && (
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>{error}</Text>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-function Group(props: { name: string; children: React.ReactNode }) {
-  return (
-    <View style={styles.group}>
-      <Text style={styles.groupHeader}>{props.name}</Text>
-      {props.children}
-    </View>
-  );
-}
-
-const styles = {
-  header: {
-    fontSize: 30,
-    margin: 20,
-  },
-  groupHeader: {
-    fontSize: 20,
-    marginBottom: 20,
-  },
-  group: {
-    margin: 20,
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 20,
-  },
+const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#eee",
+    backgroundColor: "#fff",
   },
-  view: {
-    flex: 1,
-    height: 200,
+  content: {
+    padding: 20,
+    alignItems: "center",
+    justifyContent: "center",
   },
-};
+  header: {
+    fontSize: 24,
+    marginBottom: 20,
+  },
+  resultContainer: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#e0ffe0",
+    borderRadius: 5,
+  },
+  resultTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  resultText: {
+    fontSize: 16,
+    marginTop: 5,
+  },
+  errorContainer: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#ffe0e0",
+    borderRadius: 5,
+  },
+  errorText: {
+    fontSize: 16,
+    color: "red",
+  },
+});

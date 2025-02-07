@@ -1,4 +1,4 @@
-export interface DownloadsModuleInterface {
+export interface IDownloadsModule {
   /**
    * Downloads フォルダにファイルを保存します
    * @param fileName 保存するファイル名
@@ -10,5 +10,14 @@ export interface DownloadsModuleInterface {
     fileName: string,
     mimeType: string,
     base64Data: string
-  ): Promise<string>;
+  ): Promise<DownloadResponse>;
 }
+
+export type DownloadResponse =
+  | {
+      uri: string;
+      cancelled: false;
+    }
+  | {
+      cancelled: true;
+    };

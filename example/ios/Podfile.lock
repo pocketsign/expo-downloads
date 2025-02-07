@@ -1,7 +1,7 @@
 PODS:
   - boost (1.84.0)
   - DoubleConversion (1.1.6)
-  - Downloads (0.1.0):
+  - Downloads (0.0.0):
     - ExpoModulesCore
   - EXConstants (17.0.5):
     - ExpoModulesCore
@@ -1776,7 +1776,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   boost: 1dca942403ed9342f98334bf4c3621f011aa7946
   DoubleConversion: f16ae600a246532c4020132d54af21d0ddb2a385
-  Downloads: b2be9c84cf24ebe6ba81d4b2f130ba7774360bf2
+  Downloads: 7e2a50af473a810a00fa1837218d66af2e810cc8
   EXConstants: e25c3f3ef5d1cf7a6ef911ebf7a3ab94d8d06d82
   Expo: 6a56836eb57959aec7bc0e6ce8234305af6803b7
   ExpoAsset: 715ce37a36951fee71c32773b3be50f2285e2fbe
