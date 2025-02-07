@@ -40,6 +40,6 @@ jobs:
 
       - name: 🎢 Publish packages (pre-release)
         if: steps.get-version.outputs.IS_PRERELEASE == 'true'
-        run: yarn publish --tag next
+        run: yarn publish --tag next -- --tag next
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
