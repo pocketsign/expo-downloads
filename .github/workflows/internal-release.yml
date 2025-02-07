@@ -1,0 +1,45 @@
+name: "[release] Internal release"
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🏗 Setup repository
+        uses: actions/checkout@v4
+
+      - name: 🏗 Setup Node
+        uses: ./.github/actions/setup-node
+        with:
+          npm-registry-url: https://npm.pkg.github.com
+
+      - name: 👀 Get version
+        id: get-version
+        run: |
+          VERSION=$(cat package.json | jq -r '.version')
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          IS_PRERELEASE=$([[ $VERSION =~ (alpha|beta|rc) ]] && echo 'true' || echo 'false')
+          echo "IS_PRERELEASE=$IS_PRERELEASE" >> $GITHUB_OUTPUT
+
+      - name: 🔨 Build packages
+        run: yarn build
+
+      - name: 🎢 Publish packages
+        if: steps.get-version.outputs.IS_PRERELEASE == 'false'
+        run: yarn publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🎢 Publish packages (pre-release)
+        if: steps.get-version.outputs.IS_PRERELEASE == 'true'
+        run: yarn publish --tag next
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
