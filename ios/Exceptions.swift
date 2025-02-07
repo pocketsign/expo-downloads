@@ -13,13 +13,13 @@ internal final class InvalidArgumentsException: Exception {
     }
 }
 
-internal class DownloadInProgressException: Exception {
+internal final class DownloadInProgressException: Exception {
     override var reason: String {
         "Different download is in progress. Await other download to complete"
     }
 }
 
-internal final class MissingCurrentViewControllerException: Exception {
+internal final class MissingViewControllerException: Exception {
     override var reason: String {
         "Cannot determine currently presented view controller"
     }

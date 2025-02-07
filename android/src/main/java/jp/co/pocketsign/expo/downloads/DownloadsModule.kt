@@ -1,18 +1,23 @@
 package jp.co.pocketsign.expo.downloads
 
+import android.Manifest
 import android.content.ContentValues
 import android.content.Context
-import android.net.Uri
 import android.os.Build
-import android.provider.DocumentsContract
+import android.os.Environment
 import android.provider.MediaStore
-import android.util.Base64
-import android.util.Base64InputStream
 import androidx.annotation.RequiresApi
+import expo.modules.interfaces.permissions.Permissions.askForPermissionsWithPermissionsManager
+import expo.modules.interfaces.permissions.Permissions.getPermissionsWithPermissionsManager
+import expo.modules.kotlin.Promise
 import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
-import java.io.ByteArrayInputStream
-import java.io.OutputStream
+import java.io.BufferedOutputStream
+import java.io.FileOutputStream
+
+val grantedPermissions = mapOf(
+    "canAskAgain" to true, "granted" to true, "expires" to "never", "status" to "granted"
+)
 
 class DownloadsModule : Module() {
 
@@ -26,14 +31,34 @@ class DownloadsModule : Module() {
         }
 
         AsyncFunction("saveToDownloads") { fileName: String, mimeType: String, base64Data: String ->
-            validateArgs(fileName, mimeType, base64Data)
+            validateArguments(fileName, mimeType, base64Data)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 // Android 10(Q) 以降: MediaStore APIを使用
                 saveWithMediaStore(fileName, mimeType, base64Data)
             } else {
-                // Android 9以下: Storage Access Frameworkを使用
-                saveLegacy(fileName, mimeType, base64Data)
+                // Android 9以下: 直接Downloadディレクトリに保存
+                saveLegacy(fileName, base64Data)
             }
+        }
+
+        AsyncFunction("requestPermissionsAsync") { promise: Promise ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                promise.resolve(grantedPermissions)
+                return@AsyncFunction
+            }
+            askForPermissionsWithPermissionsManager(
+                appContext.permissions, promise, Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        }
+
+        AsyncFunction("getPermissionsAsync") { promise: Promise ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                promise.resolve(grantedPermissions)
+                return@AsyncFunction
+            }
+            getPermissionsWithPermissionsManager(
+                appContext.permissions, promise, Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
         }
     }
 
@@ -52,7 +77,7 @@ class DownloadsModule : Module() {
 
         try {
             resolver.openOutputStream(uri)?.use { outputStream ->
-                decodeBase64UsingStream(base64Data, outputStream)
+                decodeBase64InChunks(base64Data, outputStream)
             } ?: throw OutputStreamCreationException()
 
             contentValues.clear()
@@ -65,61 +90,24 @@ class DownloadsModule : Module() {
         }
     }
 
-    private fun saveLegacy(fileName: String, mimeType: String, base64Data: String): DownloadResponse {
-        // Storage Access Frameworkを使用してDownloadsフォルダにファイルを作成
-        val downloadsTreeUri = Uri.parse("content://com.android.externalstorage.documents/tree/primary%3ADownload")
-        val fileUri = DocumentsContract.createDocument(mContext.contentResolver, downloadsTreeUri, mimeType, fileName)
-            ?: throw DirectoryCreationException()
+    private fun saveLegacy(fileName: String, base64Data: String): DownloadResponse {
+        val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        if (!downloadsDir.exists() && !downloadsDir.mkdirs()) {
+            throw DirectoryCreationException()
+        }
+
+        val fileToSave = getUniqueFile(downloadsDir, fileName)
 
         try {
-            mContext.contentResolver.openOutputStream(fileUri)?.use { outputStream ->
-                decodeBase64UsingStream(base64Data, outputStream)
-            } ?: throw OutputStreamCreationException()
-            return DownloadResponse(uri = fileUri.toString())
-        } catch (e: Exception) {
-            mContext.contentResolver.delete(fileUri, null, null)
-            throw e
-        }
-    }
-
-    private fun decodeBase64UsingStream(base64Data: String, outputStream: OutputStream) {
-        val byteArrayInputStream = ByteArrayInputStream(base64Data.toByteArray(Charsets.UTF_8))
-        Base64InputStream(byteArrayInputStream, Base64.DEFAULT).use { base64InputStream ->
-            val buffer = ByteArray(8192)
-            var bytesRead = base64InputStream.read(buffer)
-            while (bytesRead != -1) {
-                outputStream.write(buffer, 0, bytesRead)
-                bytesRead = base64InputStream.read(buffer)
-            }
-        }
-        outputStream.flush()
-    }
-
-    private fun validateArgs(fileName: String, mimeType: String, base64Data: String) {
-        if (fileName.trim().isEmpty()) {
-            throw InvalidArgumentException("fileName cannot be blank")
-        }
-
-        val mimePattern = Regex("^[\\w.+-]+/[\\w.+-]+$")
-        if (!mimePattern.matches(mimeType.trim())) {
-            throw InvalidArgumentException("mimeType format is invalid")
-        }
-
-        if (base64Data.isBlank()) {
-            throw InvalidArgumentException("base64Data cannot be blank")
-        }
-
-        var nonWhitespaceCharCount = 0
-        for (ch in base64Data) {
-            if (!ch.isWhitespace()) {
-                if (!(ch in 'A'..'Z' || ch in 'a'..'z' || ch in '0'..'9' || ch == '+' || ch == '/' || ch == '=')) {
-                    throw InvalidArgumentException("base64Data contains invalid character: $ch")
+            FileOutputStream(fileToSave).use { fileOutputStream ->
+                BufferedOutputStream(fileOutputStream).use { bufferedOutputStream ->
+                    decodeBase64InChunks(base64Data, bufferedOutputStream)
                 }
-                nonWhitespaceCharCount++
             }
-        }
-        if (nonWhitespaceCharCount % 4 != 0) {
-            throw InvalidArgumentException("base64Data length (ignoring whitespace) must be a multiple of 4")
+            return DownloadResponse(uri = fileToSave.toString())
+        } catch (e: Exception) {
+            fileToSave.delete() // エラー時、作成したファイルを削除
+            throw e
         }
     }
 }

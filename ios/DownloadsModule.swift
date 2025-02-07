@@ -35,10 +35,9 @@ public final class DownloadsModule: Module, DownloadResultHandler {
             }
 
             guard let viewController = appContext?.utilities?.currentViewController() else {
-                throw MissingCurrentViewControllerException()
+                throw MissingViewControllerException()
             }
 
-            // 一時ファイルのパス作成
             let tempDir = FileManager.default.temporaryDirectory
             let tempFileURL = tempDir.appendingPathComponent(fileName)
             try data.write(to: tempFileURL)
