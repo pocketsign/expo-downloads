@@ -1,0 +1,39 @@
+name: Setup Node.js
+description: Prepare and install everything for Node.js
+
+inputs:
+  node-version:
+    description: Version of Node to use
+    default: 22.x
+
+  npm-registry-url:
+    description: npm registry url
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: 🏗 Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        registry-url: ${{ inputs.npm-registry-url }}
+
+    - name: 📦 Get yarn cache directory path
+      id: yarn-cache-dir-path
+      run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+      shell: bash
+
+    - name: ♻️ Restore cache
+      uses: actions/cache@v4
+      id: yarn-cache
+      with:
+        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-yarn-
+
+    - name: 📦 Install dependencies
+      if: steps.yarn-cache.outputs.cache-hit != 'true'
+      run: yarn install --frozen-lockfile
+      shell: bash

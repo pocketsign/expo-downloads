@@ -1,0 +1,23 @@
+name: "[check] Run lint"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  all:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🏗 Setup repository
+        uses: actions/checkout@v4
+
+      - name: 🏗 Setup Node
+        uses: ./.github/actions/setup-node
+
+      - name: 🔨 Build packages
+        run: yarn build
+
+      - name: 🔬 Run lint
+        run: yarn lint
