@@ -1,0 +1,18 @@
+diff --git a/bin/npx b/bin/npx
+index 30c3df13b7d40712e122d4d8291666bba1b0982e..477769b9a0f937613ab7df48c4f8c931592d7076 100755
+--- a/bin/npx
++++ b/bin/npx
+@@ -1,5 +1,13 @@
+ #!/usr/bin/env bash
+ 
++# For pnpm, run `pnpm exec npx` and exit immediately.
++
++# shellcheck disable=SC2154
++if [[ "$npm_config_user_agent" =~ pnpm ]]; then
++  pnpm exec npx "$@"
++  exit $?
++fi
++
+ # Runs `npx` through Yarn if necessary so that the environment variables are set up similarly across
+ # Yarn and npm.
+ 

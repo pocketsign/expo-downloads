@@ -17,7 +17,11 @@ jobs:
         uses: ./.github/actions/setup-node
 
       - name: 🔨 Build packages
-        run: yarn build
+        run: pnpm build
 
       - name: 🔬 Run lint
-        run: yarn lint
+        run: pnpm lint
+
+      - name: 🔬 Run lint (example)
+        run: pnpm lint
+        working-directory: example

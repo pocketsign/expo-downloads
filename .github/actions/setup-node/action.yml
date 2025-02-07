@@ -13,26 +13,21 @@ inputs:
 runs:
   using: composite
   steps:
+    - name: 🏗 Setup pnpm
+      uses: pnpm/action-setup@v4
+
     - name: 🏗 Setup Node
       uses: actions/setup-node@v4
       with:
         node-version: ${{ inputs.node-version }}
+        cache: pnpm
         registry-url: ${{ inputs.npm-registry-url }}
 
-    - name: 📦 Get yarn cache directory path
-      id: yarn-cache-dir-path
-      run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
-      shell: bash
-
-    - name: ♻️ Restore yarn cache
-      uses: actions/cache@v4
-      id: yarn-cache
-      with:
-        path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-        key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-yarn-
-
     - name: 📦 Install dependencies
-      run: yarn install --frozen-lockfile
+      run: pnpm install
       shell: bash
+
+    - name: 📦 Install dependencies (example)
+      run: pnpm install
+      shell: bash
+      working-directory: example

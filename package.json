@@ -29,7 +29,6 @@
   "author": "PocketSign Inc.",
   "license": "MIT",
   "homepage": "https://pocketsign.co.jp/",
-  "dependencies": {},
   "devDependencies": {
     "@types/react": "~18.3.12",
     "bumpp": "^10.0.2",
@@ -44,5 +43,10 @@
     "react": "*",
     "react-native": "*"
   },
-  "packageManager": "yarn@1.22.22"
+  "packageManager": "pnpm@10.2.0",
+  "pnpm": {
+    "patchedDependencies": {
+      "expo-module-scripts": "patches/expo-module-scripts.patch"
+    }
+  }
 }

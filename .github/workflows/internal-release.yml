@@ -30,16 +30,16 @@ jobs:
           echo "IS_PRERELEASE=$IS_PRERELEASE" >> $GITHUB_OUTPUT
 
       - name: 🔨 Build packages
-        run: yarn build
+        run: pnpm run build
 
       - name: 🎢 Publish packages
         if: steps.get-version.outputs.IS_PRERELEASE == 'false'
-        run: yarn publish
+        run: pnpm publish --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 🎢 Publish packages (pre-release)
         if: steps.get-version.outputs.IS_PRERELEASE == 'true'
-        run: yarn publish --tag next -- --tag next
+        run: pnpm publish --no-git-checks --tag next
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
