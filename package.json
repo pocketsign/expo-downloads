@@ -13,7 +13,8 @@
     "prepublishOnly": "expo-module prepublishOnly",
     "expo-module": "expo-module",
     "open:ios": "xed example/ios",
-    "open:android": "open -a \"Android Studio\" example/android"
+    "open:android": "open -a \"Android Studio\" example/android",
+    "release": "bumpp -c 'release: v%s' -t 'v%s'"
   },
   "keywords": [
     "react-native",
@@ -31,6 +32,7 @@
   "dependencies": {},
   "devDependencies": {
     "@types/react": "~18.3.12",
+    "bumpp": "^10.0.2",
     "eslint": "^8.57.1",
     "expo": "~52.0.0",
     "expo-module-scripts": "^4.0.3",
