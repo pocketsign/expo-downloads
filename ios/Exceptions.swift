@@ -24,9 +24,3 @@ internal final class MissingViewControllerException: Exception {
         "Cannot determine currently presented view controller"
     }
 }
-
-internal final class UserCancelledException: Exception {
-    override var reason: String {
-        "User cancelled"
-    }
-}
