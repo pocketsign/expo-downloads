@@ -105,6 +105,9 @@ if (result.cancelled) {
 - **ERR_DIRECTORY_CREATION** (Android 9 以下)  
   - Downloads フォルダが存在しない、または作成に失敗した場合に発生します。
 
+- **ERR_OUT_OF_MEMORY**  
+  - ファイルサイズが大きすぎる場合、メモリ不足が発生しファイル保存に失敗した場合に発生します。
+
 ## プラットフォームごとの動作
 
 ### iOS

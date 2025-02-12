@@ -6,3 +6,4 @@ internal class ContentUriCreationException : CodedException("Failed to create co
 internal class DirectoryCreationException : CodedException("Failed to create downloads directory")
 internal class OutputStreamCreationException : CodedException("Failed to create downloads outputStream")
 internal class InvalidArgumentException(message: String) : CodedException("Invalid arguments: $message")
+internal class OutOfMemoryException : CodedException("Failed to save file due to out of memory")

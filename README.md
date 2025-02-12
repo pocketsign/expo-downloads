@@ -105,6 +105,9 @@ if (result.cancelled) {
 - **ERR_DIRECTORY_CREATION** (Android 9 and below)  
   - Thrown if the Downloads folder does not exist or if attempting to create it fails.
 
+- **ERR_OUT_OF_MEMORY**  
+  - Thrown when the file is too large and an OutOfMemoryError occurs during saving due to insufficient memory.
+
 ## Platform-specific Behavior
 
 ### iOS

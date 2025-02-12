@@ -84,6 +84,9 @@ class DownloadsModule : Module() {
             contentValues.put(MediaStore.Downloads.IS_PENDING, 0)
             resolver.update(uri, contentValues, null, null)
             return DownloadResponse(uri = uri.toString())
+        } catch (e: OutOfMemoryError) {
+            resolver.delete(uri, null, null)
+            throw OutOfMemoryException()
         } catch (e: Exception) {
             resolver.delete(uri, null, null)
             throw e
@@ -105,6 +108,9 @@ class DownloadsModule : Module() {
                 }
             }
             return DownloadResponse(uri = fileToSave.toString())
+        } catch (e: OutOfMemoryError) {
+            fileToSave.delete() // エラー時、作成したファイルを削除
+            throw OutOfMemoryException()
         } catch (e: Exception) {
             fileToSave.delete() // エラー時、作成したファイルを削除
             throw e
