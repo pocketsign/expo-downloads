@@ -14,12 +14,8 @@ Expo 用モジュールで、Android および iOS のネイティブ Downloads 
 
 ## インストール
 
-### npm インストール
-
-以下のコマンドでパッケージをインストールしてください。
-
 ```bash
-npm install @pocketsign/expo-downloads
+npx expo install @pocketsign/expo-downloads
 ```
 
 ## 使用方法

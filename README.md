@@ -14,12 +14,8 @@ An Expo module for directly downloading files to the native Downloads folder on 
 
 ## Installation
 
-### npm Installation
-
-Install the package using the following command:
-
 ```bash
-npm install @pocketsign/expo-downloads
+npx expo install @pocketsign/expo-downloads
 ```
 
 ## Usage
