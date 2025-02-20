@@ -1,4 +1,10 @@
-import { createPermissionHook, PermissionResponse, PermissionStatus } from "expo-modules-core";
+import {
+  CodedError,
+  createPermissionHook,
+  PermissionResponse,
+  PermissionStatus,
+  UnavailabilityError,
+} from "expo-modules-core";
 
 import Downloads from "./Downloads";
 
@@ -17,6 +23,18 @@ if (!Downloads) {
  */
 export const saveToDownloads = (fileName: string, mimeType: string, base64Data: string) =>
   Downloads.saveToDownloads(fileName, mimeType, base64Data);
+
+/**
+ * Opens a file from the Downloads folder.
+ * @param uri The URI of the file to open.
+ * @param mimeType The MIME type of the file.
+ */
+export const openDownloadFile = async (uri: string, mimeType: string) => {
+  if (!Downloads.openDownloadFile) {
+    throw new UnavailabilityError("@pocketsign/expo-downloads", "openDownloadFile");
+  }
+  return await Downloads.openDownloadFile(uri, mimeType);
+};
 
 const grantedPermissions: PermissionResponse = {
   granted: true,

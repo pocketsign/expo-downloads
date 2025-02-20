@@ -7,3 +7,4 @@ internal class DirectoryCreationException : CodedException("Failed to create dow
 internal class OutputStreamCreationException : CodedException("Failed to create downloads outputStream")
 internal class InvalidArgumentException(message: String) : CodedException("Invalid arguments: $message")
 internal class OutOfMemoryException : CodedException("Failed to save file due to out of memory")
+internal class FileOpenException : CodedException("Failed to open file: No activity found to handle the intent")

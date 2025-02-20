@@ -24,3 +24,9 @@ internal final class MissingViewControllerException: Exception {
         "Cannot determine currently presented view controller"
     }
 }
+
+internal final class FileOpenException: Exception {
+    override var reason: String {
+        "Failed to open file"
+    }
+}

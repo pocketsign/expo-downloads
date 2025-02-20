@@ -1,4 +1,5 @@
 import ExpoModulesCore
+import UIKit
 
 struct DownloadingContext {
     let promise: Promise
@@ -7,6 +8,8 @@ struct DownloadingContext {
 
 public final class DownloadsModule: Module, DownloadResultHandler {
     private var downloadingContext: DownloadingContext?
+    private var documentInteractionController: UIDocumentInteractionController?
+    private var openFileDelegate: FileOpeningDelegate?
 
     public func definition() -> ModuleDefinition {
         Name("Downloads")
@@ -55,6 +58,32 @@ public final class DownloadsModule: Module, DownloadResultHandler {
                 picker.delegate = delegate
 
                 viewController.present(picker, animated: true)
+            }
+        }
+
+        AsyncFunction("openDownloadFile") { (uri: String, mimeType: String, promise: Promise) in
+            guard let url = URL(string: uri) else {
+                throw InvalidArgumentsException("Invalid URL: \(uri)")
+            }
+            if url.scheme?.lowercased() != "file" {
+                throw InvalidArgumentsException("Invalid URL scheme: \(uri)")
+            }
+
+            guard let viewController = self.appContext?.utilities?.currentViewController() else {
+                throw MissingViewControllerException()
+            }
+
+            Task.detached { @MainActor in
+                let docController = UIDocumentInteractionController(url: url)
+                let delegate = FileOpeningDelegate(promise: promise, viewController: viewController)
+                docController.delegate = delegate
+                self.documentInteractionController = docController
+                self.openFileDelegate = delegate
+                if !docController.presentPreview(animated: true) {
+                    promise.reject(FileOpenException())
+                    self.documentInteractionController = nil
+                    self.openFileDelegate = nil
+                }
             }
         }
     }

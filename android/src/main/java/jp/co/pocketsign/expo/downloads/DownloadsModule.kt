@@ -14,6 +14,9 @@ import expo.modules.kotlin.modules.Module
 import expo.modules.kotlin.modules.ModuleDefinition
 import java.io.BufferedOutputStream
 import java.io.FileOutputStream
+import androidx.core.content.FileProvider
+import android.net.Uri
+import android.content.Intent
 
 val grantedPermissions = mapOf(
     "canAskAgain" to true, "granted" to true, "expires" to "never", "status" to "granted"
@@ -59,6 +62,18 @@ class DownloadsModule : Module() {
             getPermissionsWithPermissionsManager(
                 appContext.permissions, promise, Manifest.permission.WRITE_EXTERNAL_STORAGE
             )
+        }
+
+        AsyncFunction("openDownloadFile") { uri: String, mimeType: String ->
+            val parsedUri = try {
+                Uri.parse(uri)
+            } catch (e: Exception) {
+                throw InvalidArgumentException("uri is invalid")
+            }
+            if (parsedUri.scheme == null || (parsedUri.scheme != "content" && parsedUri.scheme != "file")) {
+                throw InvalidArgumentException("uri is invalid")
+            }
+            openFile(parsedUri, mimeType)
         }
     }
 
@@ -107,13 +122,31 @@ class DownloadsModule : Module() {
                     decodeBase64InChunks(base64Data, bufferedOutputStream)
                 }
             }
-            return DownloadResponse(uri = fileToSave.toString())
+            val contentUri = FileProvider.getUriForFile(
+                mContext,
+                "${mContext.packageName}.fileprovider",
+                fileToSave
+            )
+            return DownloadResponse(uri = contentUri.toString())
         } catch (e: OutOfMemoryError) {
             fileToSave.delete() // エラー時、作成したファイルを削除
             throw OutOfMemoryException()
         } catch (e: Exception) {
             fileToSave.delete() // エラー時、作成したファイルを削除
             throw e
+        }
+    }
+
+    private fun openFile(contentUri: Uri, mimeType: String) {
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(contentUri, mimeType)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        try {
+            mContext.startActivity(intent)
+        } catch (e: Exception) {
+            throw FileOpenException()
         }
     }
 }

@@ -1,10 +1,18 @@
 import React, { useState } from "react";
 import { encode } from "base-64";
-import { saveToDownloads, getPermissionsAsync, requestPermissionsAsync } from "@pocketsign/expo-downloads";
+import {
+  saveToDownloads,
+  getPermissionsAsync,
+  requestPermissionsAsync,
+  openDownloadFile,
+} from "@pocketsign/expo-downloads";
 import { Button, SafeAreaView, ScrollView, Text, View, StyleSheet } from "react-native";
 
 export default function App() {
-  const [result, setResult] = useState<string | null>(null);
+  const [result, setResult] = useState<{
+    uri: string;
+    mimeType: string;
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const saveFile = async (fileName: string, mimeType: string, base64Data: string) => {
@@ -24,7 +32,7 @@ export default function App() {
       if (result.cancelled) {
         setError("Download cancelled");
       } else {
-        setResult(result.uri);
+        setResult({ uri: result.uri, mimeType });
       }
     } catch (err: any) {
       setError(err.message || "An error occurred");
@@ -57,6 +65,15 @@ export default function App() {
     await saveFile(fileName, mimeType, base64Data);
   };
 
+  const openFile = async () => {
+    if (!result) return;
+    try {
+      await openDownloadFile(result.uri, result.mimeType);
+    } catch (err: any) {
+      setError(err.message || "An error occurred");
+    }
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
@@ -68,8 +85,10 @@ export default function App() {
         </View>
         {result && (
           <View style={styles.resultContainer}>
-            <Text style={styles.resultTitle}>Saved File URL:</Text>
-            <Text style={styles.resultText}>{result}</Text>
+            <Text style={styles.resultTitle}>Saved File:</Text>
+            <Text style={styles.resultText}>{result.uri}</Text>
+            <Text style={styles.resultText}>{result.mimeType}</Text>
+            <Button title="Open File" onPress={openFile} />
           </View>
         )}
         {error && (
