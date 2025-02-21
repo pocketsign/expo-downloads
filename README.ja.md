@@ -67,6 +67,15 @@ if (result.cancelled) {
     - `uri`: 保存されたファイルの URI (成功時)
     - `cancelled`: ユーザーがキャンセルした場合に `true`
 
+#### `openDownloadFile(uri: string, mimeType: string): Promise<void>`
+
+- **説明**:  
+  保存されたファイルの URIを、ネイティブのファイルビューアで開きます。
+
+- **引数**:
+  - `uri`: 開くファイルの URI（`saveToDownloads` の戻り値の `uri` を指定してください）
+  - `mimeType`: ファイルの MIME タイプ
+
 ### 権限関連関数
 
 - **`requestPermissionsAsync`**:  
@@ -79,8 +88,11 @@ if (result.cancelled) {
 
 #### 共通例外
 
-- **ERR_INVALID_ARGUMENT** (iOS / Android)  
+- **ERR_INVALID_ARGUMENT**  
   - `fileName` が空、`mimeType` のフォーマットが不正、または `base64Data` の形式に問題がある場合に発生します。
+
+- **FileOpenException**  
+  - ファイルを開く際に発生する例外です。指定されたファイルが存在しない場合、または対応するビューアが見つからない場合にスローされます。
 
 #### iOS 固有の例外
 

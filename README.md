@@ -67,6 +67,15 @@ if (result.cancelled) {
     - `uri`: The URI of the saved file (upon success).
     - `cancelled`: `true` if the operation was cancelled by the user.
 
+#### `openDownloadFile(uri: string, mimeType: string): Promise<void>`
+
+- **Description**:  
+  Opens the downloaded file using the native file viewer on the device.
+
+- **Parameters**:
+  - `uri`: The URI of the file to be opened. (Use the `uri` field of the `DownloadResponse` object returned by `saveToDownloads`.)
+  - `mimeType`: The MIME type of the file.
+
 ### Permission-related Functions
 
 - **`requestPermissionsAsync`**:  
@@ -81,6 +90,9 @@ if (result.cancelled) {
 
 - **ERR_INVALID_ARGUMENT** (iOS / Android)  
   - Thrown if the `fileName` is empty, if the `mimeType` format is invalid, or if the `base64Data` is improperly formatted.
+
+- **FileOpenException**  
+  - Thrown when an error occurs while attempting to open a file. This exception is raised if the specified file does not exist or if a compatible application cannot be found to open it.
 
 #### iOS Specific Exceptions
 
