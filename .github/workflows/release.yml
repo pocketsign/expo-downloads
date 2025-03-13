@@ -1,17 +1,15 @@
-name: "[release] Publish Package to GitHub Packages"
+name: "[release] Publish Package to npmjs"
 
 on:
-  push:
-    tags:
-      - "v*"
-
-permissions:
-  contents: read
-  packages: write
+  release:
+    types: [published]
 
 jobs:
-  release:
+  build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: 🏗 Setup repository
         uses: actions/checkout@v4
@@ -19,7 +17,7 @@ jobs:
       - name: 🏗 Setup Node
         uses: ./.github/actions/setup-node
         with:
-          npm-registry-url: https://npm.pkg.github.com
+          npm-registry-url: https://registry.npmjs.org
 
       - name: 👀 Get version
         id: get-version
@@ -34,12 +32,12 @@ jobs:
 
       - name: 🎢 Publish packages
         if: steps.get-version.outputs.IS_PRERELEASE == 'false'
-        run: pnpm publish --no-git-checks
+        run: pnpm publish --access public --no-git-checks
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: 🎢 Publish packages (pre-release)
         if: steps.get-version.outputs.IS_PRERELEASE == 'true'
-        run: pnpm publish --no-git-checks --tag next
+        run: pnpm publish --access public --no-git-checks --tag next
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
