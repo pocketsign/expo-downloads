@@ -1,6 +1,6 @@
 import UIKit
 
-protocol DownloadResultHandler {
+internal protocol DownloadResultHandler {
     func didDownloadAt(urls: [URL])
     func didCancel()
 }

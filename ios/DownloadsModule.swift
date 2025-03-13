@@ -1,15 +1,19 @@
 import ExpoModulesCore
 import UIKit
 
-struct DownloadingContext {
+internal struct DownloadingContext {
     let promise: Promise
     let delegate: DownloadingDelegate
 }
 
-public final class DownloadsModule: Module, DownloadResultHandler {
+internal struct OpeningFileContext {
+    let promise: Promise
+    let delegate: OpeningFileDelegate
+}
+
+public final class DownloadsModule: Module, DownloadResultHandler, OpeningFileResultHandler {
     private var downloadingContext: DownloadingContext?
-    private var documentInteractionController: UIDocumentInteractionController?
-    private var openFileDelegate: FileOpeningDelegate?
+    private var openingFileContext: OpeningFileContext?
 
     public func definition() -> ModuleDefinition {
         Name("Downloads")
@@ -19,6 +23,7 @@ public final class DownloadsModule: Module, DownloadResultHandler {
             if downloadingContext != nil {
                 throw DownloadInProgressException()
             }
+
             if fileName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 throw InvalidArgumentsException("fileName cannot be blank")
             }
@@ -74,15 +79,13 @@ public final class DownloadsModule: Module, DownloadResultHandler {
             }
 
             Task.detached { @MainActor in
-                let docController = UIDocumentInteractionController(url: url)
-                let delegate = FileOpeningDelegate(promise: promise, viewController: viewController)
-                docController.delegate = delegate
-                self.documentInteractionController = docController
-                self.openFileDelegate = delegate
-                if !docController.presentPreview(animated: true) {
+                let controller = UIDocumentInteractionController(url: url)
+                let delegate = OpeningFileDelegate(handler: self, viewController: viewController)
+                controller.delegate = delegate
+                self.openingFileContext = OpeningFileContext(promise: promise, delegate: delegate)
+                if !controller.presentPreview(animated: true) {
                     promise.reject(FileOpenException())
-                    self.documentInteractionController = nil
-                    self.openFileDelegate = nil
+                    self.openingFileContext = nil
                 }
             }
         }
@@ -104,5 +107,14 @@ public final class DownloadsModule: Module, DownloadResultHandler {
         }
         downloadingContext = nil
         promise.resolve(DownloadResponse(cancelled: true))
+    }
+
+    func didEndPreview() {
+        guard let promise = self.openingFileContext?.promise else {
+            log.error("openingFileContext has been lost.")
+            return
+        }
+        openingFileContext = nil
+        promise.resolve(nil)
     }
 }

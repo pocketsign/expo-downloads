@@ -5,11 +5,10 @@ import { DownloadResponse, IDownloadsModule } from "./Downloads.types";
 class DownloadsModule extends NativeModule implements IDownloadsModule {
   async saveToDownloads(fileName: string, mimeType: string, base64Data: string): Promise<DownloadResponse> {
     const byteCharacters = atob(base64Data);
-    const byteNumbers = new Array(byteCharacters.length);
+    const byteArray = new Uint8Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
+      byteArray[i] = byteCharacters.charCodeAt(i);
     }
-    const byteArray = new Uint8Array(byteNumbers);
     const blob = new Blob([byteArray], { type: mimeType });
 
     const objectUrl = URL.createObjectURL(blob);
