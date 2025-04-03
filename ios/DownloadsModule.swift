@@ -18,19 +18,22 @@ public final class DownloadsModule: Module, DownloadResultHandler, OpeningFileRe
     public func definition() -> ModuleDefinition {
         Name("Downloads")
 
-        AsyncFunction("saveToDownloads") {
-            (fileName: String, mimeType: String, base64Data: String, promise: Promise) in
+        AsyncFunction("saveFile") { (options: SaveFileOptions, promise: Promise) in
             if downloadingContext != nil {
                 throw DownloadInProgressException()
             }
 
-            if fileName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            let fileName = options.fileName.trimmingCharacters(in: .whitespacesAndNewlines)
+            let mimeType = options.mimeType.trimmingCharacters(in: .whitespacesAndNewlines)
+            let base64Data = options.base64Data.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            if fileName.isEmpty {
                 throw InvalidArgumentsException("fileName cannot be blank")
             }
-            if mimeType.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || !mimeType.contains("/") {
+            if mimeType.isEmpty || !mimeType.contains("/") {
                 throw InvalidArgumentsException("mimeType format is invalid")
             }
-            if base64Data.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            if base64Data.isEmpty {
                 throw InvalidArgumentsException("base64Data cannot be blank")
             }
             let nonWhitespace = base64Data.filter { !$0.isWhitespace }
@@ -38,7 +41,7 @@ public final class DownloadsModule: Module, DownloadResultHandler, OpeningFileRe
                 throw InvalidArgumentsException("base64Data length (ignoring whitespace) must be a multiple of 4")
             }
 
-            guard let data = Data(base64Encoded: base64Data) else {
+            guard let data = Data(base64Encoded: options.base64Data) else {
                 throw InvalidArgumentsException("base64Data is invalid")
             }
 
@@ -47,7 +50,7 @@ public final class DownloadsModule: Module, DownloadResultHandler, OpeningFileRe
             }
 
             let tempDir = FileManager.default.temporaryDirectory
-            let tempFileURL = tempDir.appendingPathComponent(fileName)
+            let tempFileURL = tempDir.appendingPathComponent(options.fileName)
             try data.write(to: tempFileURL)
 
             Task.detached { @MainActor in
@@ -66,12 +69,12 @@ public final class DownloadsModule: Module, DownloadResultHandler, OpeningFileRe
             }
         }
 
-        AsyncFunction("openDownloadFile") { (uri: String, mimeType: String, promise: Promise) in
-            guard let url = URL(string: uri) else {
-                throw InvalidArgumentsException("Invalid URL: \(uri)")
+        AsyncFunction("openFile") { (options: OpenFileOptions, promise: Promise) in
+            guard let url = URL(string: options.uri) else {
+                throw InvalidArgumentsException("Invalid URL: \(options.uri)")
             }
             if url.scheme?.lowercased() != "file" {
-                throw InvalidArgumentsException("Invalid URL scheme: \(uri)")
+                throw InvalidArgumentsException("Invalid URL scheme: \(options.uri)")
             }
 
             guard let viewController = self.appContext?.utilities?.currentViewController() else {

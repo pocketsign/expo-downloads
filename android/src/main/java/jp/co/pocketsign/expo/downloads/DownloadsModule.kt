@@ -17,6 +17,8 @@ import java.io.FileOutputStream
 import androidx.core.content.FileProvider
 import android.net.Uri
 import android.content.Intent
+import jp.co.pocketsign.expo.downloads.SaveFileOptions
+import jp.co.pocketsign.expo.downloads.OpenFileOptions
 
 val grantedPermissions = mapOf(
     "canAskAgain" to true, "granted" to true, "expires" to "never", "status" to "granted"
@@ -33,14 +35,14 @@ class DownloadsModule : Module() {
             mContext = requireNotNull(appContext.reactContext) { "ReactContext is null" }
         }
 
-        AsyncFunction("saveToDownloads") { fileName: String, mimeType: String, base64Data: String ->
-            validateArguments(fileName, mimeType, base64Data)
+        AsyncFunction("saveFile") { options: SaveFileOptions ->
+            validateArguments(options.fileName, options.mimeType, options.base64Data)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 // Android 10(Q) 以降: MediaStore APIを使用
-                saveWithMediaStore(fileName, mimeType, base64Data)
+                saveWithMediaStore(options.fileName, options.mimeType, options.base64Data)
             } else {
                 // Android 9以下: 直接Downloadディレクトリに保存
-                saveLegacy(fileName, base64Data)
+                saveLegacy(options.fileName, options.base64Data)
             }
         }
 
@@ -64,16 +66,16 @@ class DownloadsModule : Module() {
             )
         }
 
-        AsyncFunction("openDownloadFile") { uri: String, mimeType: String ->
+        AsyncFunction("openFile") { options: OpenFileOptions ->
             val parsedUri = try {
-                Uri.parse(uri)
+                Uri.parse(options.uri)
             } catch (e: Exception) {
                 throw InvalidArgumentException("uri is invalid")
             }
             if (parsedUri.scheme == null || (parsedUri.scheme != "content" && parsedUri.scheme != "file")) {
                 throw InvalidArgumentException("uri is invalid")
             }
-            openFile(parsedUri, mimeType)
+            openFile(parsedUri, options.mimeType)
         }
     }
 

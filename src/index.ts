@@ -1,39 +1,36 @@
-import {
-  CodedError,
-  createPermissionHook,
-  PermissionResponse,
-  PermissionStatus,
-  UnavailabilityError,
-} from "expo-modules-core";
+import { createPermissionHook, PermissionResponse, PermissionStatus, UnavailabilityError } from "expo-modules-core";
 
 import Downloads from "./Downloads";
+import { OpenFileOptions, SaveFileOptions, SaveFileResponse } from "./Downloads.types";
 
-export { DownloadResponse } from "./Downloads.types";
+export { SaveFileResponse, OpenFileOptions, SaveFileOptions };
 
 if (!Downloads) {
   console.warn("No native Downloads module found, are you sure the expo-downloads's module is linked properly?");
 }
 
 /**
- * Saves a file to the Downloads folder.
- * @param fileName The name of the file to save.
- * @param mimeType The MIME type of the file.
- * @param base64Data Base64 encoded file data.
- * @returns A Promise that resolves with the URL of the saved file.
+ * Saves a file to the system.
+ * Android: Saves to the global download folder.
+ * iOS: Saves to a folder selected by the user.
+ *
+ * @param options Save options
+ * @returns Returns a Promise containing the URL of the saved file.
  */
-export const saveToDownloads = (fileName: string, mimeType: string, base64Data: string) =>
-  Downloads.saveToDownloads(fileName, mimeType, base64Data);
+export const saveFile = (options: SaveFileOptions) => {
+  return Downloads.saveFile(options);
+};
 
 /**
- * Opens a file from the Downloads folder.
- * @param uri The URI of the file to open.
- * @param mimeType The MIME type of the file.
+ * Opens a saved file.
+ *
+ * @param options Options to open a file
  */
-export const openDownloadFile = async (uri: string, mimeType: string) => {
-  if (!Downloads.openDownloadFile) {
-    throw new UnavailabilityError("@pocketsign/expo-downloads", "openDownloadFile");
+export const openFile = async (options: OpenFileOptions) => {
+  if (!Downloads.openFile) {
+    throw new UnavailabilityError("@pocketsign/expo-downloads", "openFile");
   }
-  return await Downloads.openDownloadFile(uri, mimeType);
+  return await Downloads.openFile(options);
 };
 
 const grantedPermissions: PermissionResponse = {
@@ -44,10 +41,10 @@ const grantedPermissions: PermissionResponse = {
 };
 
 /**
- * Requests permissions for accessing external storage.
- * On Android 9 and below, this function explicitly requests WRITE_EXTERNAL_STORAGE permission.
- * For devices other than Android 9 and below, no special permission is required.
- * @returns A Promise that resolves with the permission response.
+ * Requests permission to access external storage.
+ * For Android 9 and below, explicitly requests WRITE_EXTERNAL_STORAGE permission.
+ * For other devices, no special permissions are required.
+ * @returns Returns a Promise containing the permission response.
  */
 export const requestPermissionsAsync = async (): Promise<PermissionResponse> => {
   if (Downloads.requestPermissionsAsync) {
@@ -57,10 +54,10 @@ export const requestPermissionsAsync = async (): Promise<PermissionResponse> => 
 };
 
 /**
- * Gets the current permissions for accessing external storage.
- * On Android 9 and below, this function verifies the WRITE_EXTERNAL_STORAGE permission.
- * For devices other than Android 9 and below, no special permission is required.
- * @returns A Promise that resolves with the permission response.
+ * Gets the current state of permission to access external storage.
+ * For Android 9 and below, verifies WRITE_EXTERNAL_STORAGE permission.
+ * For other devices, no special permissions are required.
+ * @returns Returns a Promise containing the permission response.
  */
 export const getPermissionsAsync = async (): Promise<PermissionResponse> => {
   if (Downloads.getPermissionsAsync) {
@@ -70,9 +67,9 @@ export const getPermissionsAsync = async (): Promise<PermissionResponse> => {
 };
 
 /**
- * A hook to manage permissions for accessing external storage.
- * On Android 9 and below, WRITE_EXTERNAL_STORAGE permission handling is required.
- * For devices other than Android 9 and below, no special permission is required.
+ * Hook to manage permission to access external storage.
+ * For Android 9 and below, processing of WRITE_EXTERNAL_STORAGE permission is required.
+ * For other devices, no special permissions are required.
  */
 export const usePermissions = createPermissionHook({
   getMethod: getPermissionsAsync,

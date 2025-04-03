@@ -20,15 +20,17 @@ npx expo install @pocketsign/expo-downloads
 
 ## 使用方法
 
-下記のサンプルコードは、`example.txt` という名前のテキストファイルを Base64 エンコードされたデータからネイティブの Downloads フォルダへ保存する例です。  
+下記のサンプルコードは、`example.txt` という名前のテキストファイルを Base64 エンコードされたデータからネイティブの Downloads フォルダへ保存する例です。
 Android 9 以下の場合は、`WRITE_EXTERNAL_STORAGE` 権限の確認も行っています。
 
-```javascript:README.md
-import { saveToDownloads, getPermissionsAsync, requestPermissionsAsync } from "@pocketsign/expo-downloads";
+```javascript
+import { saveFile, openFile, getPermissionsAsync, requestPermissionsAsync } from "@pocketsign/expo-downloads";
 
-const fileName = "example.txt";
-const mimeType = "text/plain";
-const base64Data = "SGVsbG8sIFdvcmxkIQ=="; // "Hello, World!" の Base64 エンコード
+const options = {
+  fileName: "example.txt",
+  mimeType: "text/plain",
+  base64Data: "SGVsbG8sIFdvcmxkIQ==", // "Hello, World!" の Base64 エンコード
+};
 
 // Android 9 以下の場合、WRITE_EXTERNAL_STORAGE の権限を取得します。
 const permissions = await getPermissionsAsync();
@@ -40,11 +42,17 @@ if (!permissions.granted) {
   }
 }
 
-const result = await saveToDownloads(fileName, mimeType, base64Data);
-if (result.cancelled) {
-  console.log("ダウンロードがキャンセルされました");
-} else {
-  console.log(`ファイルが保存されました: ${result.uri}`);
+try {
+  const result = await saveFile(options);
+  if (result.cancelled) {
+    console.log("ダウンロードがキャンセルされました");
+  } else {
+    console.log(`ファイルが保存されました: ${result.uri}`);
+    // 保存直後にファイルを開く例
+    await openFile({ uri: result.uri, mimeType: options.mimeType });
+  }
+} catch (error) {
+  console.error("ファイルの保存またはオープン中にエラーが発生しました:", error);
 }
 ```
 
@@ -52,28 +60,28 @@ if (result.cancelled) {
 
 ### 関数
 
-#### `saveToDownloads(fileName: string, mimeType: string, base64Data: string): Promise<DownloadResponse>`
+#### `saveFile(options: SaveFileOptions): Promise<SaveFileResponse>`
 
-- **説明**:  
-  Base64 形式の文字列データを、指定されたファイル名と MIME タイプでネイティブの Downloads フォルダに保存します。
+- **説明**:
+  指定されたオプションを使用して、Base64 エンコードされたファイルデータを保存します。
 
-- **引数**:
+- **引数** (`SaveFileOptions` オブジェクト):
+
   - `fileName`: 保存するファイル名
   - `mimeType`: ファイルの MIME タイプ
   - `base64Data`: Base64 でエンコードされたファイルデータ
 
-- **戻り値**:
-  - `DownloadResponse` オブジェクト  
-    - `uri`: 保存されたファイルの URI (成功時)
-    - `cancelled`: ユーザーがキャンセルした場合に `true`
+- **戻り値** (`SaveFileResponse` オブジェクト):
+  - `uri`: 保存されたファイルの URI (成功時)
+  - `cancelled`: ユーザーが操作をキャンセルした場合に `true` (iOS のみ)
 
-#### `openDownloadFile(uri: string, mimeType: string): Promise<void>`
+#### `openFile(options: OpenFileOptions): Promise<void>`
 
-- **説明**:  
-  保存されたファイルの URIを、ネイティブのファイルビューアで開きます。
+- **説明**:
+  保存されたファイルを、ネイティブのファイルビューアで開きます。
 
-- **引数**:
-  - `uri`: 開くファイルの URI（`saveToDownloads` の戻り値の `uri` を指定してください）
+- **引数** (`OpenFileOptions` オブジェクト):
+  - `uri`: 開くファイルの URI（`saveFile` の戻り値の `uri` を指定してください）
   - `mimeType`: ファイルの MIME タイプ
 
 ### 権限関連関数
@@ -88,32 +96,37 @@ if (result.cancelled) {
 
 #### 共通例外
 
-- **ERR_INVALID_ARGUMENT**  
+- **ERR_INVALID_ARGUMENT**
+
   - `fileName` が空、`mimeType` のフォーマットが不正、または `base64Data` の形式に問題がある場合に発生します。
 
-- **FileOpenException**  
+- **FileOpenException**
   - ファイルを開く際に発生する例外です。指定されたファイルが存在しない場合、または対応するビューアが見つからない場合にスローされます。
 
 #### iOS 固有の例外
 
-- **ERR_DOWNLOAD_IN_PROGRESS**  
+- **ERR_DOWNLOAD_IN_PROGRESS**
+
   - 既にダウンロード処理が進行中の場合に発生します。複数のダウンロード実行を防止します。
 
-- **ERR_MISSING_VIEW_CONTROLLER**  
+- **ERR_MISSING_VIEW_CONTROLLER**
   - 現在の表示中の ViewController を取得できない場合に発生します。（ファイル保存用のダイアログを表示できない場合）
 
 #### Android 固有の例外
 
-- **ERR_CONTENT_URI_CREATION** (Android 10 以上)  
+- **ERR_CONTENT_URI_CREATION** (Android 10 以上)
+
   - MediaStore API を使ってコンテンツ URI の作成に失敗した場合に発生します。
 
-- **ERR_OUTPUT_STREAM_CREATION** (Android 10 以上)  
+- **ERR_OUTPUT_STREAM_CREATION** (Android 10 以上)
+
   - ファイル書き込み用の OutputStream の作成に失敗した場合に発生します。
 
-- **ERR_DIRECTORY_CREATION** (Android 9 以下)  
+- **ERR_DIRECTORY_CREATION** (Android 9 以下)
+
   - Downloads フォルダが存在しない、または作成に失敗した場合に発生します。
 
-- **ERR_OUT_OF_MEMORY**  
+- **ERR_OUT_OF_MEMORY**
   - ファイルサイズが大きすぎる場合、メモリ不足が発生しファイル保存に失敗した場合に発生します。
 
 ## プラットフォームごとの動作

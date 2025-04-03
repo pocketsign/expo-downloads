@@ -1,9 +1,9 @@
 import { registerWebModule, NativeModule } from "expo";
 
-import { DownloadResponse, IDownloadsModule } from "./Downloads.types";
+import { SaveFileResponse, IDownloadsModule, SaveFileOptions } from "./Downloads.types";
 
 class DownloadsModule extends NativeModule implements IDownloadsModule {
-  async saveToDownloads(fileName: string, mimeType: string, base64Data: string): Promise<DownloadResponse> {
+  async saveFile({ fileName, mimeType, base64Data }: SaveFileOptions): Promise<SaveFileResponse> {
     const byteCharacters = atob(base64Data);
     const byteArray = new Uint8Array(byteCharacters.length);
     for (let i = 0; i < byteCharacters.length; i++) {

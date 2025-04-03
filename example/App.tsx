@@ -1,11 +1,6 @@
 import React, { useState } from "react";
 import { encode } from "base-64";
-import {
-  saveToDownloads,
-  getPermissionsAsync,
-  requestPermissionsAsync,
-  openDownloadFile,
-} from "@pocketsign/expo-downloads";
+import * as Downloads from "@pocketsign/expo-downloads";
 import { Button, SafeAreaView, ScrollView, Text, View, StyleSheet } from "react-native";
 
 export default function App() {
@@ -19,16 +14,16 @@ export default function App() {
     setError(null);
     setResult(null);
     try {
-      const permissions = await getPermissionsAsync();
+      const permissions = await Downloads.getPermissionsAsync();
       if (!permissions.granted) {
-        const newPermissions = await requestPermissionsAsync();
+        const newPermissions = await Downloads.requestPermissionsAsync();
         if (!newPermissions.granted) {
           setError("Permission not granted");
           return;
         }
       }
 
-      const result = await saveToDownloads(fileName, mimeType, base64Data);
+      const result = await Downloads.saveFile({ fileName, mimeType, base64Data });
       if (result.cancelled) {
         setError("Download cancelled");
       } else {
@@ -68,7 +63,7 @@ export default function App() {
   const openFile = async () => {
     if (!result) return;
     try {
-      await openDownloadFile(result.uri, result.mimeType);
+      await Downloads.openFile({ uri: result.uri, mimeType: result.mimeType });
     } catch (err: any) {
       setError(err.message || "An error occurred");
     }
