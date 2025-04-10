@@ -100,7 +100,7 @@ try {
 
   - Thrown if the `fileName` is empty, if the `mimeType` format is invalid, or if the `base64Data` is improperly formatted.
 
-- **FileOpenException**
+- **ERR_FILE_OPEN**
   - Thrown when an error occurs while attempting to open a file. This exception is raised if the specified file does not exist or if a compatible application cannot be found to open it.
 
 #### iOS Specific Exceptions
