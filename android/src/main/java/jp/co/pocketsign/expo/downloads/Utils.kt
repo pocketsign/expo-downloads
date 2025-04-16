@@ -4,12 +4,12 @@ import android.util.Base64
 import java.io.File
 import java.io.OutputStream
 
-fun getUniqueFile(directory: File, fileName: String): File {
-    var fileToSave = File(directory, fileName)
+fun getUniqueFile(directory: File, name: String): File {
+    var fileToSave = File(directory, name)
     if (fileToSave.exists()) {
-        val dotIndex = fileName.lastIndexOf('.')
-        val baseName = if (dotIndex != -1) fileName.substring(0, dotIndex) else fileName
-        val extension = if (dotIndex != -1) fileName.substring(dotIndex) else ""
+        val dotIndex = name.lastIndexOf('.')
+        val baseName = if (dotIndex != -1) name.substring(0, dotIndex) else name
+        val extension = if (dotIndex != -1) name.substring(dotIndex) else ""
         var counter = 1
         var newName = "$baseName ($counter)$extension"
         var newFile = File(directory, newName)
@@ -37,30 +37,23 @@ fun decodeBase64InChunks(base64Data: String, outputStream: OutputStream) {
     outputStream.flush()
 }
 
-fun validateArguments(fileName: String, mimeType: String, base64Data: String) {
-    if (fileName.trim().isEmpty()) {
-        throw InvalidArgumentException("fileName cannot be blank")
+fun processDataWithEncoding(data: String, encoding: Encoding, outputStream: OutputStream) {
+    when (encoding) {
+        Encoding.base64 -> decodeBase64InChunks(data, outputStream)
+        Encoding.utf8 -> {
+            outputStream.write(data.toByteArray(Charsets.UTF_8))
+            outputStream.flush()
+        }
+    }
+}
+
+fun validateArguments(name: String, type: String) {
+    if (name.trim().isEmpty()) {
+        throw InvalidArgumentException("name cannot be blank")
     }
 
     val mimePattern = Regex("^[\\w.+-]+/[\\w.+-]+$")
-    if (!mimePattern.matches(mimeType.trim())) {
-        throw InvalidArgumentException("mimeType format is invalid")
-    }
-
-    if (base64Data.isBlank()) {
-        throw InvalidArgumentException("base64Data cannot be blank")
-    }
-
-    var nonWhitespaceCharCount = 0
-    for (ch in base64Data) {
-        if (!ch.isWhitespace()) {
-            if (!(ch in 'A'..'Z' || ch in 'a'..'z' || ch in '0'..'9' || ch == '+' || ch == '/' || ch == '=')) {
-                throw InvalidArgumentException("base64Data contains invalid character: $ch")
-            }
-            nonWhitespaceCharCount++
-        }
-    }
-    if (nonWhitespaceCharCount % 4 != 0) {
-        throw InvalidArgumentException("base64Data length (ignoring whitespace) must be a multiple of 4")
+    if (!mimePattern.matches(type.trim())) {
+        throw InvalidArgumentException("type format is invalid")
     }
 }

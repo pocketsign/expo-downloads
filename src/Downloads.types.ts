@@ -27,11 +27,13 @@ export type SaveFileResponse =
  */
 export type SaveFileOptions = {
   /** File name to save */
-  fileName: string;
+  name: string;
   /** MIME type of the file */
-  mimeType: string;
-  /** Base64 encoded file data */
-  base64Data: string;
+  type: string;
+  /** File data */
+  data: string;
+  /** File encoding @default "utf8" */
+  encoding?: "base64" | "utf8";
 };
 
 /**
@@ -41,5 +43,5 @@ export type OpenFileOptions = {
   /** URI of the file to open */
   uri: string;
   /** MIME type of the file */
-  mimeType: string;
+  type: string;
 };

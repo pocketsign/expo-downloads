@@ -17,8 +17,6 @@ import java.io.FileOutputStream
 import androidx.core.content.FileProvider
 import android.net.Uri
 import android.content.Intent
-import jp.co.pocketsign.expo.downloads.SaveFileOptions
-import jp.co.pocketsign.expo.downloads.OpenFileOptions
 
 val grantedPermissions = mapOf(
     "canAskAgain" to true, "granted" to true, "expires" to "never", "status" to "granted"
@@ -36,13 +34,13 @@ class DownloadsModule : Module() {
         }
 
         AsyncFunction("saveFile") { options: SaveFileOptions ->
-            validateArguments(options.fileName, options.mimeType, options.base64Data)
+            validateArguments(options.name, options.type)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 // Android 10(Q) 以降: MediaStore APIを使用
-                saveWithMediaStore(options.fileName, options.mimeType, options.base64Data)
+                saveWithMediaStore(options.name, options.type, options.data, options.encoding ?: Encoding.utf8)
             } else {
                 // Android 9以下: 直接Downloadディレクトリに保存
-                saveLegacy(options.fileName, options.base64Data)
+                saveLegacy(options.name, options.data, options.encoding ?: Encoding.utf8)
             }
         }
 
@@ -75,15 +73,15 @@ class DownloadsModule : Module() {
             if (parsedUri.scheme == null || (parsedUri.scheme != "content" && parsedUri.scheme != "file")) {
                 throw InvalidArgumentException("uri is invalid")
             }
-            openFile(parsedUri, options.mimeType)
+            openFile(parsedUri, options.type)
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
-    private fun saveWithMediaStore(fileName: String, mimeType: String, base64Data: String): DownloadResponse {
+    private fun saveWithMediaStore(name: String, type: String, data: String, encoding: Encoding): DownloadResponse {
         val contentValues = ContentValues().apply {
-            put(MediaStore.Downloads.DISPLAY_NAME, fileName)
-            put(MediaStore.Downloads.MIME_TYPE, mimeType)
+            put(MediaStore.Downloads.DISPLAY_NAME, name)
+            put(MediaStore.Downloads.MIME_TYPE, type)
             put(MediaStore.Downloads.IS_PENDING, 1)
         }
 
@@ -94,7 +92,7 @@ class DownloadsModule : Module() {
 
         try {
             resolver.openOutputStream(uri)?.use { outputStream ->
-                decodeBase64InChunks(base64Data, outputStream)
+                processDataWithEncoding(data, encoding, outputStream)
             } ?: throw OutputStreamCreationException()
 
             contentValues.clear()
@@ -110,18 +108,18 @@ class DownloadsModule : Module() {
         }
     }
 
-    private fun saveLegacy(fileName: String, base64Data: String): DownloadResponse {
+    private fun saveLegacy(name: String, data: String, encoding: Encoding): DownloadResponse {
         val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
         if (!downloadsDir.exists() && !downloadsDir.mkdirs()) {
             throw DirectoryCreationException()
         }
 
-        val fileToSave = getUniqueFile(downloadsDir, fileName)
+        val fileToSave = getUniqueFile(downloadsDir, name)
 
         try {
             FileOutputStream(fileToSave).use { fileOutputStream ->
                 BufferedOutputStream(fileOutputStream).use { bufferedOutputStream ->
-                    decodeBase64InChunks(base64Data, bufferedOutputStream)
+                    processDataWithEncoding(data, encoding, bufferedOutputStream)
                 }
             }
             val contentUri = FileProvider.getUriForFile(
@@ -139,9 +137,9 @@ class DownloadsModule : Module() {
         }
     }
 
-    private fun openFile(contentUri: Uri, mimeType: String) {
+    private fun openFile(uri: Uri, type: String) {
         val intent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(contentUri, mimeType)
+            setDataAndType(uri, type)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }

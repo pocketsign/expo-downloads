@@ -23,26 +23,18 @@ public final class DownloadsModule: Module, DownloadResultHandler, OpeningFileRe
                 throw DownloadInProgressException()
             }
 
-            let fileName = options.fileName.trimmingCharacters(in: .whitespacesAndNewlines)
-            let mimeType = options.mimeType.trimmingCharacters(in: .whitespacesAndNewlines)
-            let base64Data = options.base64Data.trimmingCharacters(in: .whitespacesAndNewlines)
+            let name = options.name.trimmingCharacters(in: .whitespacesAndNewlines)
+            let data = options.data.trimmingCharacters(in: .whitespacesAndNewlines)
+            let encoding = options.encoding ?? .utf8
 
-            if fileName.isEmpty {
-                throw InvalidArgumentsException("fileName cannot be blank")
+            if name.isEmpty {
+                throw InvalidArgumentsException("name cannot be blank")
             }
-            if mimeType.isEmpty || !mimeType.contains("/") {
-                throw InvalidArgumentsException("mimeType format is invalid")
+            if data.isEmpty {
+                throw InvalidArgumentsException("data cannot be blank")
             }
-            if base64Data.isEmpty {
-                throw InvalidArgumentsException("base64Data cannot be blank")
-            }
-            let nonWhitespace = base64Data.filter { !$0.isWhitespace }
-            if nonWhitespace.count % 4 != 0 {
-                throw InvalidArgumentsException("base64Data length (ignoring whitespace) must be a multiple of 4")
-            }
-
-            guard let data = Data(base64Encoded: options.base64Data) else {
-                throw InvalidArgumentsException("base64Data is invalid")
+            guard let encodedData = (encoding == .base64 ? Data(base64Encoded: data) : data.data(using: .utf8)) else {
+                throw InvalidArgumentsException("data is invalid")
             }
 
             guard let viewController = appContext?.utilities?.currentViewController() else {
@@ -50,8 +42,8 @@ public final class DownloadsModule: Module, DownloadResultHandler, OpeningFileRe
             }
 
             let tempDir = FileManager.default.temporaryDirectory
-            let tempFileURL = tempDir.appendingPathComponent(options.fileName)
-            try data.write(to: tempFileURL)
+            let tempFileURL = tempDir.appendingPathComponent(name)
+            try encodedData.write(to: tempFileURL)
 
             Task.detached { @MainActor in
                 let picker: UIDocumentPickerViewController
