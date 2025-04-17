@@ -20,16 +20,16 @@ npx expo install @pocketsign/expo-downloads
 
 ## 使用方法
 
-下記のサンプルコードは、`example.txt` という名前のテキストファイルを Base64 エンコードされたデータからネイティブの Downloads フォルダへ保存する例です。
+下記のサンプルコードは、`example.txt` という名前のテキストファイルをネイティブの Downloads フォルダへ保存する例です。
 Android 9 以下の場合は、`WRITE_EXTERNAL_STORAGE` 権限の確認も行っています。
 
 ```javascript
 import { saveFile, openFile, getPermissionsAsync, requestPermissionsAsync } from "@pocketsign/expo-downloads";
 
 const options = {
-  fileName: "example.txt",
-  mimeType: "text/plain",
-  base64Data: "SGVsbG8sIFdvcmxkIQ==", // "Hello, World!" の Base64 エンコード
+  name: "example.txt",
+  type: "text/plain",
+  data: "Hello, World!",
 };
 
 // Android 9 以下の場合、WRITE_EXTERNAL_STORAGE の権限を取得します。
@@ -49,7 +49,7 @@ try {
   } else {
     console.log(`ファイルが保存されました: ${result.uri}`);
     // 保存直後にファイルを開く例
-    await openFile({ uri: result.uri, mimeType: options.mimeType });
+    await openFile({ uri: result.uri, type: options.type });
   }
 } catch (error) {
   console.error("ファイルの保存またはオープン中にエラーが発生しました:", error);
@@ -67,9 +67,10 @@ try {
 
 - **引数** (`SaveFileOptions` オブジェクト):
 
-  - `fileName`: 保存するファイル名
-  - `mimeType`: ファイルの MIME タイプ
-  - `base64Data`: Base64 でエンコードされたファイルデータ
+  - `name`: 保存するファイル名
+  - `type`: ファイルの MIME タイプ
+  - `data`: 保存するファイルデータ
+  - `encoding`: (省略可) データのエンコーディング、"base64" または "utf8"。デフォルトは "utf8"
 
 - **戻り値** (`SaveFileResponse` オブジェクト):
   - `uri`: 保存されたファイルの URI (成功時)
@@ -82,7 +83,7 @@ try {
 
 - **引数** (`OpenFileOptions` オブジェクト):
   - `uri`: 開くファイルの URI（`saveFile` の戻り値の `uri` を指定してください）
-  - `mimeType`: ファイルの MIME タイプ
+  - `type`: ファイルの MIME タイプ
 
 ### 権限関連関数
 
@@ -98,7 +99,7 @@ try {
 
 - **ERR_INVALID_ARGUMENT**
 
-  - `fileName` が空、`mimeType` のフォーマットが不正、または `base64Data` の形式に問題がある場合に発生します。
+  - `name` が空、`type` のフォーマットが不正、または `data` の形式に問題がある場合に発生します。
 
 - **ERR_FILE_OPEN**
   - ファイルを開く際に発生する例外です。指定されたファイルが存在しない場合、または対応するビューアが見つからない場合にスローされます。

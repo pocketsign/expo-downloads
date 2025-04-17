@@ -20,16 +20,16 @@ npx expo install @pocketsign/expo-downloads
 
 ## Usage
 
-Below is a sample code which saves a text file named `example.txt`—sourced from Base64 encoded data—to the native Downloads folder.
+Below is a sample code which saves a text file named `example.txt` to the native Downloads folder.
 For Android versions 9 and below, the `WRITE_EXTERNAL_STORAGE` permission is checked.
 
 ```javascript
 import { saveFile, openFile, getPermissionsAsync, requestPermissionsAsync } from "@pocketsign/expo-downloads";
 
 const options = {
-  fileName: "example.txt",
-  mimeType: "text/plain",
-  base64Data: "SGVsbG8sIFdvcmxkIQ==", // "Hello, World!" encoded in Base64
+  name: "example.txt",
+  type: "text/plain",
+  data: "Hello, World!",
 };
 
 // For Android 9 and below, request WRITE_EXTERNAL_STORAGE permission.
@@ -49,7 +49,7 @@ try {
   } else {
     console.log(`File saved successfully: ${result.uri}`);
     // Example of opening the file immediately after saving
-    await openFile({ uri: result.uri, mimeType: options.mimeType });
+    await openFile({ uri: result.uri, type: options.type });
   }
 } catch (error) {
   console.error("Error saving or opening file:", error);
@@ -67,9 +67,10 @@ try {
 
 - **Parameters** (`SaveFileOptions` object):
 
-  - `fileName`: The name under which the file will be saved.
-  - `mimeType`: The MIME type of the file.
-  - `base64Data`: The file data encoded in Base64.
+  - `name`: The name under which the file will be saved.
+  - `type`: The MIME type of the file.
+  - `data`: The file data to be saved.
+  - `encoding`: (Optional) The encoding of the data, either "base64" or "utf8". Defaults to "utf8".
 
 - **Returns** (`SaveFileResponse` object):
   - `uri`: The URI of the saved file (upon success).
@@ -82,7 +83,7 @@ try {
 
 - **Parameters** (`OpenFileOptions` object):
   - `uri`: The URI of the file to be opened. (Use the `uri` field of the `SaveFileResponse` object returned by `saveFile`.)
-  - `mimeType`: The MIME type of the file.
+  - `type`: The MIME type of the file.
 
 ### Permission-related Functions
 
@@ -98,7 +99,7 @@ try {
 
 - **ERR_INVALID_ARGUMENT** (iOS / Android)
 
-  - Thrown if the `fileName` is empty, if the `mimeType` format is invalid, or if the `base64Data` is improperly formatted.
+  - Thrown if the `name` is empty, if the `type` format is invalid, or if the `data` is improperly formatted.
 
 - **ERR_FILE_OPEN**
   - Thrown when an error occurs while attempting to open a file. This exception is raised if the specified file does not exist or if a compatible application cannot be found to open it.
