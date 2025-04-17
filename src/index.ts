@@ -28,7 +28,7 @@ export const saveFile = (options: SaveFileOptions) => {
  */
 export const openFile = async (options: OpenFileOptions) => {
   if (!Downloads.openFile) {
-    throw new UnavailabilityError("@pocketsign/expo-downloads", "openFile");
+    throw new UnavailabilityError("expo-downloads", "openFile");
   }
   return await Downloads.openFile(options);
 };

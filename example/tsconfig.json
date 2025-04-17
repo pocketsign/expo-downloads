@@ -3,8 +3,8 @@
   "compilerOptions": {
     "strict": true,
     "paths": {
-      "@pocketsign/expo-downloads": ["../src/index"],
-      "@pocketsign/expo-downloads/*": ["../src/*"]
+      "expo-downloads": ["../src/index"],
+      "expo-downloads/*": ["../src/*"]
     }
   }
 }

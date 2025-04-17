@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import * as Downloads from "@pocketsign/expo-downloads";
+import * as Downloads from "expo-downloads";
 import { Button, SafeAreaView, ScrollView, Text, View, StyleSheet } from "react-native";
 
 export default function App() {

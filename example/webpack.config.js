@@ -7,7 +7,7 @@ module.exports = async (env, argv) => {
     {
       ...env,
       babel: {
-        dangerouslyAddModulePathsToTranspile: ["@pocketsign/expo-downloads"],
+        dangerouslyAddModulePathsToTranspile: ["expo-downloads"],
       },
     },
     argv,

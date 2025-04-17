@@ -1,4 +1,4 @@
-# @pocketsign/expo-downloads
+# expo-downloads
 
 Expo 用モジュールで、Android および iOS のネイティブ Downloads フォルダにファイルを直接ダウンロードするためのライブラリです。
 
@@ -15,7 +15,7 @@ Expo 用モジュールで、Android および iOS のネイティブ Downloads 
 ## インストール
 
 ```bash
-npx expo install @pocketsign/expo-downloads
+npx expo install expo-downloads
 ```
 
 ## 使用方法
@@ -24,7 +24,7 @@ npx expo install @pocketsign/expo-downloads
 Android 9 以下の場合は、`WRITE_EXTERNAL_STORAGE` 権限の確認も行っています。
 
 ```javascript
-import { saveFile, openFile, getPermissionsAsync, requestPermissionsAsync } from "@pocketsign/expo-downloads";
+import { saveFile, openFile, getPermissionsAsync, requestPermissionsAsync } from "expo-downloads";
 
 const options = {
   name: "example.txt",

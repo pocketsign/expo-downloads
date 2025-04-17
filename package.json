@@ -1,5 +1,5 @@
 {
-  "name": "@pocketsign/expo-downloads",
+  "name": "expo-downloads",
   "version": "0.0.3",
   "description": "An Expo module for downloading files directly to the native Downloads folder on Android and iOS.",
   "main": "build/index.js",
@@ -19,7 +19,7 @@
   "keywords": [
     "react-native",
     "expo",
-    "@pocketsign/expo-downloads",
+    "expo-downloads",
     "Downloads"
   ],
   "repository": "https://github.com/pocketsign/expo-downloads",

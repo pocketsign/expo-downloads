@@ -1,4 +1,4 @@
-# @pocketsign/expo-downloads
+# expo-downloads
 
 An Expo module for directly downloading files to the native Downloads folder on Android and iOS.
 
@@ -15,7 +15,7 @@ An Expo module for directly downloading files to the native Downloads folder on 
 ## Installation
 
 ```bash
-npx expo install @pocketsign/expo-downloads
+npx expo install expo-downloads
 ```
 
 ## Usage
@@ -24,7 +24,7 @@ Below is a sample code which saves a text file named `example.txt` to the native
 For Android versions 9 and below, the `WRITE_EXTERNAL_STORAGE` permission is checked.
 
 ```javascript
-import { saveFile, openFile, getPermissionsAsync, requestPermissionsAsync } from "@pocketsign/expo-downloads";
+import { saveFile, openFile, getPermissionsAsync, requestPermissionsAsync } from "expo-downloads";
 
 const options = {
   name: "example.txt",
