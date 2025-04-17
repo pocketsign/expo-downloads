@@ -1,6 +1,6 @@
 {
   "name": "expo-downloads",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "An Expo module for downloading files directly to the native Downloads folder on Android and iOS.",
   "main": "build/index.js",
   "types": "build/index.d.ts",
