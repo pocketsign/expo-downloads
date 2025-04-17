@@ -28,7 +28,7 @@
   },
   "author": "PocketSign Inc.",
   "license": "MIT",
-  "homepage": "https://pocketsign.co.jp/",
+  "homepage": "https://github.com/pocketsign/expo-downloads",
   "devDependencies": {
     "@types/react": "~18.3.12",
     "bumpp": "^10.0.2",
