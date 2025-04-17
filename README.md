@@ -6,6 +6,7 @@ An Expo module for directly downloading files to the native Downloads folder on 
 
 - [Installation](#installation)
 - [Usage](#usage)
+- [Demo Videos](#demo-videos)
 - [API Specification](#api-specification)
   - [Functions](#functions)
   - [Permission-related Functions](#permission-related-functions)
@@ -55,6 +56,28 @@ try {
   console.error("Error saving or opening file:", error);
 }
 ```
+
+## Demo Videos
+
+### Android
+
+#### Text file download
+
+https://github.com/user-attachments/assets/cdf7bc14-a5a4-428e-bd4b-5a717a4e5f42
+
+#### Image file download
+
+https://github.com/user-attachments/assets/e0fd6d5f-3981-430e-872c-573b951595e4
+
+### iOS
+
+#### Text file download
+
+https://github.com/user-attachments/assets/1f8740e8-b740-47e4-909f-cac6e1b188d6
+
+#### Image file download
+
+https://github.com/user-attachments/assets/564f5285-9a7e-4b70-98cb-41f04905c8cf
 
 ## API Specification
 

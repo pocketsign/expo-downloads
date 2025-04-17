@@ -6,6 +6,7 @@ Expo 用モジュールで、Android および iOS のネイティブ Downloads 
 
 - [インストール](#インストール)
 - [使用方法](#使用方法)
+- [デモ動画](#デモ動画)
 - [API 仕様](#api-仕様)
   - [関数](#関数)
   - [権限関連関数](#権限関連関数)
@@ -55,6 +56,28 @@ try {
   console.error("ファイルの保存またはオープン中にエラーが発生しました:", error);
 }
 ```
+
+## デモ動画
+
+### Android
+
+#### テキストファイルのダウンロード
+
+https://github.com/user-attachments/assets/cdf7bc14-a5a4-428e-bd4b-5a717a4e5f42
+
+#### 画像ファイルのダウンロード
+
+https://github.com/user-attachments/assets/e0fd6d5f-3981-430e-872c-573b951595e4
+
+### iOS
+
+#### テキストファイルのダウンロード
+
+https://github.com/user-attachments/assets/1f8740e8-b740-47e4-909f-cac6e1b188d6
+
+#### 画像ファイルのダウンロード
+
+https://github.com/user-attachments/assets/564f5285-9a7e-4b70-98cb-41f04905c8cf
 
 ## API 仕様
 
