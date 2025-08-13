@@ -7,7 +7,12 @@
   "scripts": {
     "build": "expo-module build",
     "clean": "expo-module clean",
-    "lint": "expo-module lint",
+    "lint": "pnpm run /^lint:/",
+    "lint:expo": "expo-module lint",
+    "lint:prettier": "prettier --check \"src/**/*.{ts,tsx}\"",
+    "fix": "pnpm run /^fix:/",
+    "fix:expo": "expo-module lint --fix",
+    "fix:prettier": "prettier --write \"src/**/*.{ts,tsx}\"",
     "test": "expo-module test",
     "prepare": "expo-module prepare",
     "prepublishOnly": "expo-module prepublishOnly",
@@ -30,23 +35,21 @@
   "license": "MIT",
   "homepage": "https://github.com/pocketsign/expo-downloads",
   "devDependencies": {
-    "@types/react": "~18.3.12",
-    "bumpp": "^10.0.2",
-    "eslint": "^8.57.1",
-    "expo": "~52.0.46",
-    "expo-module-scripts": "^4.0.3",
-    "prettier": "^3.4.2",
-    "react-native": "0.76.9"
+    "@types/react": "~19.0.14",
+    "bumpp": "^10.2.3",
+    "eslint": "^9.33.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-config-universe": "^15.0.3",
+    "eslint-plugin-prettier": "^5.5.4",
+    "expo": "~53.0.20",
+    "expo-module-scripts": "^4.1.10",
+    "prettier": "^3.6.2",
+    "react-native": "0.79.5"
   },
   "peerDependencies": {
     "expo": "*",
     "react": "*",
     "react-native": "*"
   },
-  "packageManager": "pnpm@10.2.0",
-  "pnpm": {
-    "patchedDependencies": {
-      "expo-module-scripts": "patches/expo-module-scripts.patch"
-    }
-  }
+  "packageManager": "pnpm@10.14.0"
 }

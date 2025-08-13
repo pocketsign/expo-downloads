@@ -31,4 +31,4 @@ class DownloadsModule extends NativeModule implements IDownloadsModule {
   }
 }
 
-export default registerWebModule(DownloadsModule);
+export default registerWebModule(DownloadsModule, "Downloads");

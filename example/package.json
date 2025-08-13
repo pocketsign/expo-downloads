@@ -8,25 +8,30 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "lint": "eslint ."
+    "lint": "pnpm run /^lint:/",
+    "lint:eslint": "eslint .",
+    "lint:prettier": "prettier --check .",
+    "fix": "pnpm run /^fix:/",
+    "fix:eslint": "eslint --fix .",
+    "fix:prettier": "prettier --write ."
   },
   "dependencies": {
-    "@expo/metro-runtime": "~4.0.1",
-    "expo": "~52.0.46",
-    "react": "18.3.1",
-    "react-dom": "18.3.1",
-    "react-native": "0.76.9",
-    "react-native-web": "~0.19.13"
+    "@expo/metro-runtime": "~5.0.4",
+    "expo": "~53.0.20",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
+    "react-native": "0.79.5",
+    "react-native-web": "~0.20.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.2",
-    "@types/react": "~18.3.12",
-    "eslint": "^8.57.1",
-    "eslint-config-expo": "^8.0.1",
-    "eslint-config-prettier": "^10.0.1",
-    "eslint-plugin-prettier": "^5.2.3",
-    "prettier": "^3.4.2",
-    "typescript": "^5.3.3"
+    "@babel/core": "^7.28.0",
+    "@types/react": "~19.0.14",
+    "eslint": "^9.33.0",
+    "eslint-config-expo": "^9.2.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "prettier": "^3.6.2",
+    "typescript": "^5.8.3"
   },
   "private": true,
   "expo": {
@@ -34,5 +39,5 @@
       "nativeModulesDir": ".."
     }
   },
-  "packageManager": "pnpm@10.2.0"
+  "packageManager": "pnpm@10.14.0"
 }
