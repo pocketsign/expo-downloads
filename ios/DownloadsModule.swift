@@ -37,21 +37,17 @@ public final class DownloadsModule: Module, DownloadResultHandler, OpeningFileRe
                 throw InvalidArgumentsException("data is invalid")
             }
 
-            guard let viewController = appContext?.utilities?.currentViewController() else {
-                throw MissingViewControllerException()
-            }
-
             let tempDir = FileManager.default.temporaryDirectory
             let tempFileURL = tempDir.appendingPathComponent(name)
             try encodedData.write(to: tempFileURL)
 
             Task.detached { @MainActor in
-                let picker: UIDocumentPickerViewController
-                if #available(iOS 15.0, *) {
-                    picker = UIDocumentPickerViewController(forExporting: [tempFileURL], asCopy: true)
-                } else {
-                    picker = UIDocumentPickerViewController(url: tempFileURL, in: .exportToService)
+                guard let viewController = self.appContext?.utilities?.currentViewController() else {
+                    promise.reject(MissingViewControllerException())
+                    return
                 }
+
+                let picker = UIDocumentPickerViewController(forExporting: [tempFileURL], asCopy: true)
                 let delegate = DownloadingDelegate(handler: self)
 
                 self.downloadingContext = DownloadingContext(promise: promise, delegate: delegate)
@@ -69,11 +65,12 @@ public final class DownloadsModule: Module, DownloadResultHandler, OpeningFileRe
                 throw InvalidArgumentsException("Invalid URL scheme: \(options.uri)")
             }
 
-            guard let viewController = self.appContext?.utilities?.currentViewController() else {
-                throw MissingViewControllerException()
-            }
-
             Task.detached { @MainActor in
+                guard let viewController = self.appContext?.utilities?.currentViewController() else {
+                    promise.reject(MissingViewControllerException())
+                    return
+                }
+
                 let controller = UIDocumentInteractionController(url: url)
                 let delegate = OpeningFileDelegate(handler: self, viewController: viewController)
                 controller.delegate = delegate
