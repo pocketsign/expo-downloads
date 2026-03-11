@@ -35,16 +35,16 @@
   "license": "MIT",
   "homepage": "https://github.com/pocketsign/expo-downloads",
   "devDependencies": {
-    "@types/react": "~19.0.14",
+    "@types/react": "~19.2.10",
     "bumpp": "^10.2.3",
     "eslint": "^9.33.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-config-universe": "^15.0.3",
     "eslint-plugin-prettier": "^5.5.4",
-    "expo": "~53.0.20",
+    "expo": "~55.0.0",
     "expo-module-scripts": "^4.1.10",
     "prettier": "^3.6.2",
-    "react-native": "0.79.5"
+    "react-native": "0.83.2"
   },
   "peerDependencies": {
     "expo": "*",
