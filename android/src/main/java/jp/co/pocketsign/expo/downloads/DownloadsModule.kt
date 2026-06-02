@@ -17,6 +17,9 @@ import java.io.FileOutputStream
 import androidx.core.content.FileProvider
 import android.net.Uri
 import android.content.Intent
+import android.content.ActivityNotFoundException
+import android.os.Handler
+import android.os.Looper
 
 val grantedPermissions = mapOf(
     "canAskAgain" to true, "granted" to true, "expires" to "never", "status" to "granted"
@@ -64,7 +67,7 @@ class DownloadsModule : Module() {
             )
         }
 
-        AsyncFunction("openFile") { options: OpenFileOptions ->
+        AsyncFunction("openFile") { options: OpenFileOptions, promise: Promise ->
             val parsedUri = try {
                 Uri.parse(options.uri)
             } catch (e: Exception) {
@@ -73,7 +76,7 @@ class DownloadsModule : Module() {
             if (parsedUri.scheme == null || (parsedUri.scheme != "content" && parsedUri.scheme != "file")) {
                 throw InvalidArgumentException("uri is invalid")
             }
-            openFile(parsedUri, options.type)
+            openFile(parsedUri, options.type, promise)
         }
     }
 
@@ -137,16 +140,22 @@ class DownloadsModule : Module() {
         }
     }
 
-    private fun openFile(uri: Uri, type: String) {
+    private fun openFile(uri: Uri, type: String, promise: Promise) {
         val intent = Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(uri, type)
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        try {
-            mContext.startActivity(intent)
-        } catch (e: Exception) {
-            throw FileOpenException()
+        Handler(Looper.getMainLooper()).post {
+            try {
+                mContext.startActivity(intent)
+                promise.resolve(null)
+            } catch (e: ActivityNotFoundException) {
+                // 開けるアプリが無い場合。フリーズさせず明示的に拒否する
+                promise.reject(FileOpenException())
+            } catch (e: Exception) {
+                promise.reject(FileOpenException())
+            }
         }
     }
 }
