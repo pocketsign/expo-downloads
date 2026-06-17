@@ -1,6 +1,6 @@
 import { registerWebModule, NativeModule } from "expo";
 
-import { SaveFileResponse, IDownloadsModule, SaveFileOptions } from "./Downloads.types";
+import type { SaveFileResponse, IDownloadsModule, SaveFileOptions } from "./Downloads.types";
 
 class DownloadsModule extends NativeModule implements IDownloadsModule {
   async saveFile({ name, type, data, encoding }: SaveFileOptions): Promise<SaveFileResponse> {

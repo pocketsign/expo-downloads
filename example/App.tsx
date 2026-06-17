@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import * as SplashScreen from "expo-splash-screen";
 import * as Downloads from "expo-downloads";
-import { Button, SafeAreaView, ScrollView, Text, View, StyleSheet } from "react-native";
+import { Button, Platform, ScrollView, StatusBar, Text, View, StyleSheet } from "react-native";
+
+void SplashScreen.hideAsync();
 
 export default function App() {
   const [result, setResult] = useState<{
@@ -68,7 +71,7 @@ export default function App() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.header}>Downloads Module Sample</Text>
         <View style={styles.buttons}>
@@ -90,7 +93,7 @@ export default function App() {
           </View>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -98,6 +101,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#fff",
+    paddingTop: Platform.OS === "ios" ? 72 : (StatusBar.currentHeight ?? 0),
   },
   content: {
     padding: 20,

@@ -1,9 +1,10 @@
-import { createPermissionHook, PermissionResponse, PermissionStatus, UnavailabilityError } from "expo-modules-core";
+import { createPermissionHook, PermissionStatus, UnavailabilityError } from "expo-modules-core";
+import type { PermissionResponse } from "expo-modules-core";
 
 import Downloads from "./Downloads";
-import { OpenFileOptions, SaveFileOptions, SaveFileResponse } from "./Downloads.types";
+import type { OpenFileOptions, SaveFileOptions } from "./Downloads.types";
 
-export { SaveFileResponse, OpenFileOptions, SaveFileOptions };
+export type { SaveFileResponse, OpenFileOptions, SaveFileOptions } from "./Downloads.types";
 
 if (!Downloads) {
   console.warn("No native Downloads module found, are you sure the expo-downloads's module is linked properly?");

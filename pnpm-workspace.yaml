@@ -1,0 +1,21 @@
+allowBuilds:
+  msgpackr-extract: true
+nodeLinker: hoisted
+overrides:
+  '@babel/core@<=7.29.0': 7.29.7
+  '@babel/plugin-transform-modules-systemjs@>=7.12.0 <=7.29.3': 7.29.7
+  'picomatch@<3': 2.3.2
+  'picomatch@>=4 <4.0.4': 4.0.4
+  '@xmldom/xmldom': 0.8.13
+  '@tootallnate/once': 2.0.1
+  'brace-expansion@>=5.0.0 <5.0.6': 5.0.6
+  defu: 6.1.7
+  flatted: 3.4.2
+  form-data: 4.0.6
+  js-yaml: 4.2.0
+  lodash: 4.18.1
+  node-forge: 1.4.0
+  shell-quote: 1.8.4
+  ws: 8.21.0
+  yaml: 2.9.0
+preferSymlinkedExecutables: false
