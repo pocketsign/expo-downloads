@@ -1,4 +1,4 @@
-/* eslint-env node */
+/* global __dirname */
 const createConfigAsync = require("@expo/webpack-config");
 const path = require("path");
 
@@ -12,7 +12,6 @@ module.exports = async (env, argv) => {
     },
     argv,
   );
-  // eslint-disable-next-line no-undef
   config.resolve.modules = [path.resolve(__dirname, "./node_modules"), path.resolve(__dirname, "../node_modules")];
 
   return config;

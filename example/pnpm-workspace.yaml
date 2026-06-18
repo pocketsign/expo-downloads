@@ -1,0 +1,5 @@
+allowBuilds:
+  msgpackr-extract: true
+  unrs-resolver: true
+nodeLinker: hoisted
+preferSymlinkedExecutables: false
