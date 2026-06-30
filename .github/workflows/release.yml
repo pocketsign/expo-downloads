@@ -34,11 +34,7 @@ jobs:
       - name: 🎢 Publish packages
         if: steps.get-version.outputs.IS_PRERELEASE == 'false'
         run: pnpm publish --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: 🎢 Publish packages (pre-release)
         if: steps.get-version.outputs.IS_PRERELEASE == 'true'
         run: pnpm publish --access public --no-git-checks --tag next
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
