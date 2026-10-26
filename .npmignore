@@ -28,6 +28,7 @@ __tests__
 /DEVELOPMENT.md
 
 /babel.config.js
+/eslint.config.cjs
 /internal/module_scripts/
 /android/src/androidTest/**
 /android/src/test/**
