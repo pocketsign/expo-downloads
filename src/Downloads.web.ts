@@ -1,11 +1,11 @@
-import { registerWebModule, NativeModule } from "expo";
+import { registerWebModule, NativeModule } from 'expo';
 
-import type { SaveFileResponse, IDownloadsModule, SaveFileOptions } from "./Downloads.types";
+import type { SaveFileResponse, IDownloadsModule, SaveFileOptions } from './Downloads.types';
 
 class DownloadsModule extends NativeModule implements IDownloadsModule {
   async saveFile({ name, type, data, encoding }: SaveFileOptions): Promise<SaveFileResponse> {
     const blob = (() => {
-      if (encoding === "base64") {
+      if (encoding === 'base64') {
         const byteCharacters = atob(data);
         const byteArray = new Uint8Array(byteCharacters.length);
         for (let i = 0; i < byteCharacters.length; i++) {
@@ -18,11 +18,11 @@ class DownloadsModule extends NativeModule implements IDownloadsModule {
 
     const objectUrl = URL.createObjectURL(blob);
 
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = objectUrl;
-    link.setAttribute("download", name);
-    link.innerHTML = "downloading...";
-    link.style.display = "none";
+    link.setAttribute('download', name);
+    link.innerHTML = 'downloading...';
+    link.style.display = 'none';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -31,4 +31,4 @@ class DownloadsModule extends NativeModule implements IDownloadsModule {
   }
 }
 
-export default registerWebModule(DownloadsModule, "Downloads");
+export default registerWebModule(DownloadsModule, 'Downloads');

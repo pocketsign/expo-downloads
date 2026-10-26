@@ -29,6 +29,9 @@
           "backgroundColor": "#ffffff"
         }
       ]
-    ]
+    ],
+    "experiments": {
+      "autolinkingModuleResolution": true
+    }
   }
 }

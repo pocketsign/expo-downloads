@@ -1,15 +1,15 @@
 import ExpoModulesCore
 
 internal final class InvalidArgumentsException: Exception {
-    private let message: String
+    private let detail: String
 
-    init(_ message: String) {
-        self.message = message
+    init(_ detail: String) {
+        self.detail = detail
         super.init()
     }
 
     override var reason: String {
-        "Invalid arguments: \(message)"
+        "Invalid arguments: \(detail)"
     }
 }
 
