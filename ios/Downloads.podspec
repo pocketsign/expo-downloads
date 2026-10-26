@@ -10,7 +10,10 @@ Pod::Spec.new do |s|
   s.license        = package['license']
   s.author         = package['author']
   s.homepage       = package['homepage']
-  s.platform       = :ios, '15.1'
+  # tvOS は UIDocumentInteractionController などを使えないので対象にしない
+  s.platforms      = {
+    :ios => '16.4'
+  }
   s.swift_version  = '5.9'
   s.source         = { git: 'https://github.com/pocketsign/expo-downloads' }
   s.static_framework = true
