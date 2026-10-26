@@ -1,4 +1,4 @@
-import type { PermissionResponse } from "expo-modules-core";
+import type { PermissionResponse } from 'expo-modules-core';
 
 export interface IDownloadsModule {
   saveFile: (options: SaveFileOptions) => Promise<SaveFileResponse>;
@@ -33,7 +33,7 @@ export type SaveFileOptions = {
   /** File data */
   data: string;
   /** File encoding @default "utf8" */
-  encoding?: "base64" | "utf8";
+  encoding?: 'base64' | 'utf8';
 };
 
 /**

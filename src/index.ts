@@ -1,13 +1,15 @@
-import { createPermissionHook, PermissionStatus, UnavailabilityError } from "expo-modules-core";
-import type { PermissionResponse } from "expo-modules-core";
+import { createPermissionHook, PermissionStatus, UnavailabilityError } from 'expo-modules-core';
+import type { PermissionResponse } from 'expo-modules-core';
 
-import Downloads from "./Downloads";
-import type { OpenFileOptions, SaveFileOptions } from "./Downloads.types";
+import Downloads from './Downloads';
+import type { OpenFileOptions, SaveFileOptions } from './Downloads.types';
 
-export type { SaveFileResponse, OpenFileOptions, SaveFileOptions } from "./Downloads.types";
+export type { SaveFileResponse, OpenFileOptions, SaveFileOptions } from './Downloads.types';
 
 if (!Downloads) {
-  console.warn("No native Downloads module found, are you sure the expo-downloads's module is linked properly?");
+  console.warn(
+    "No native Downloads module found, are you sure the expo-downloads's module is linked properly?"
+  );
 }
 
 /**
@@ -29,14 +31,14 @@ export const saveFile = (options: SaveFileOptions) => {
  */
 export const openFile = async (options: OpenFileOptions) => {
   if (!Downloads.openFile) {
-    throw new UnavailabilityError("expo-downloads", "openFile");
+    throw new UnavailabilityError('expo-downloads', 'openFile');
   }
   return await Downloads.openFile(options);
 };
 
 const grantedPermissions: PermissionResponse = {
   granted: true,
-  expires: "never",
+  expires: 'never',
   canAskAgain: true,
   status: PermissionStatus.GRANTED,
 };
