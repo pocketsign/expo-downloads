@@ -1,5 +1,5 @@
-import { createPermissionHook, PermissionStatus, UnavailabilityError } from 'expo-modules-core';
-import type { PermissionResponse } from 'expo-modules-core';
+import { createPermissionHook, PermissionStatus, UnavailabilityError } from 'expo';
+import type { PermissionResponse } from 'expo';
 
 import Downloads from './Downloads';
 import type { OpenFileOptions, SaveFileOptions } from './Downloads.types';

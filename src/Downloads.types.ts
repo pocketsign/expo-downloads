@@ -1,4 +1,4 @@
-import type { PermissionResponse } from 'expo-modules-core';
+import type { PermissionResponse } from 'expo';
 
 export interface IDownloadsModule {
   saveFile: (options: SaveFileOptions) => Promise<SaveFileResponse>;
