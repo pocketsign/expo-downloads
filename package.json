@@ -5,20 +5,18 @@
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "scripts": {
-    "build": "expo-module build",
-    "clean": "expo-module clean",
+    "build": "node internal/module_scripts/build.js",
+    "clean": "node internal/module_scripts/clean.js",
     "lint": "pnpm run /^lint:/",
-    "lint:expo": "expo-module lint",
+    "lint:eslint": "eslint src/",
     "lint:prettier": "prettier --check \"src/**/*.{ts,tsx}\"",
     "fix": "pnpm run /^fix:/",
-    "fix:expo": "expo-module lint --fix",
+    "fix:eslint": "eslint --fix src/",
     "fix:prettier": "prettier --write \"src/**/*.{ts,tsx}\"",
-    "test": "expo-module test",
-    "prepare": "expo-module prepare",
-    "prepublishOnly": "expo-module prepublishOnly",
-    "expo-module": "expo-module",
-    "open:ios": "xed example/ios",
-    "open:android": "open -a \"Android Studio\" example/android",
+    "test": "node internal/module_scripts/test.js",
+    "prepare": "node internal/module_scripts/prepare.js",
+    "open:ios": "node internal/module_scripts/open-ios.js",
+    "open:android": "node internal/module_scripts/open-android.js",
     "release": "bumpp -c 'release: v%s' -t 'v%s'"
   },
   "keywords": [
@@ -33,19 +31,32 @@
   },
   "author": "PocketSign Inc.",
   "license": "MIT",
-  "homepage": "https://github.com/pocketsign/expo-downloads",
+  "homepage": "https://github.com/pocketsign/expo-downloads#readme",
+  "dependencies": {},
   "devDependencies": {
+    "@babel/core": "^7.26.0",
     "@expo/dom-webview": "~58.0.2",
+    "@react-native/jest-preset": "0.88.0",
+    "@types/jest": "^30.0.0",
     "@types/react": "~19.3.0",
+    "babel-preset-expo": "~58.0.19",
     "bumpp": "^11.1.0",
-    "eslint": "^9.39.4",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-config-universe": "^15.2.0",
-    "eslint-plugin-prettier": "^5.5.6",
+    "eslint": "~9.39.4",
+    "eslint-config-universe": "^16.1.2",
     "expo": "~58.0.19",
-    "expo-module-scripts": "^56.0.3",
+    "jest": "^30.0.0",
+    "jest-expo": "~58.0.12",
     "prettier": "^3.8.4",
-    "react-native": "0.88.0"
+    "react": "19.3.0",
+    "react-native": "0.88.0",
+    "typescript": "~6.0.3"
+  },
+  "jest": {
+    "preset": "jest-expo",
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "passWithNoTests": true
   },
   "peerDependencies": {
     "expo": "*",
