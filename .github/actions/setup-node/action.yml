@@ -10,14 +10,17 @@ inputs:
     description: npm registry url
     default: ""
 
+# 中で使う action は、このアクションを `$/` で参照するワークフローの actions.lock で固定される。
+# zizmor は composite action を単体で検査して未固定と判定するため、unpinned-uses を行ごとに無視している
+# (composite action の lock の扱いは github/gh-actions-lock#183 で議論中)。
 runs:
   using: composite
   steps:
     - name: 🏗 Setup pnpm
-      uses: pnpm/action-setup@v6
+      uses: pnpm/action-setup@v6 # zizmor: ignore[unpinned-uses]
 
     - name: 🏗 Setup Node
-      uses: actions/setup-node@v7
+      uses: actions/setup-node@v7 # zizmor: ignore[unpinned-uses]
       with:
         node-version: ${{ inputs.node-version }}
         cache: pnpm

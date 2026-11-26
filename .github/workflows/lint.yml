@@ -6,12 +6,17 @@ on:
       - main
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   all:
     runs-on: ubuntu-latest
     steps:
       - name: 🏗 Setup repository
         uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
 
       - name: 🏗 Setup Node
         uses: $/.github/actions/setup-node
