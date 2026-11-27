@@ -17,10 +17,10 @@ runs:
   using: composite
   steps:
     - name: 🏗 Setup pnpm
-      uses: pnpm/action-setup@v6 # zizmor: ignore[unpinned-uses]
+      uses: pnpm/action-setup@v6.1.1 # zizmor: ignore[unpinned-uses]
 
     - name: 🏗 Setup Node
-      uses: actions/setup-node@v7 # zizmor: ignore[unpinned-uses]
+      uses: actions/setup-node@v7.1.0 # zizmor: ignore[unpinned-uses]
       with:
         node-version: ${{ inputs.node-version }}
         cache: pnpm
